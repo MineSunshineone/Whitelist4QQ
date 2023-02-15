@@ -105,3 +105,4 @@ bot:
     bind-failed-selfdata: |-
       绑定失败，在保存白名单文件时出现异常！
       请联系管理员查看控制台处理！
+    bind-failed-unsafe-name: '绑定失败，不合法的正版用户名'
