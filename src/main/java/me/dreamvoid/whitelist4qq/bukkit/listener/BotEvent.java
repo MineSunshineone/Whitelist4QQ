@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +25,11 @@ import static me.dreamvoid.whitelist4qq.bukkit.Config.*;
 public class BotEvent implements Listener {
 
     private final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\\\_]+$");
+    private final Map<Long, String> qqBindConfirmMap;
+
+    public BotEvent() {
+        qqBindConfirmMap = new ConcurrentHashMap<>();
+    }
 
     @EventHandler
     public void onGroupMessage(MiraiGroupMessageEvent e) {
@@ -34,16 +41,33 @@ public class BotEvent implements Listener {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BukkitPlugin.getInstance().getConfig().getString("bot.messages.bind-failed-unsafe-name", "绑定失败，不合法的正版用户名"));
                 return;
             }
+
             if (!GEN_UseSelfData) {
                 if ((GEN_PreventIDRebind && (MiraiMC.getBind(Bukkit.getOfflinePlayer(playerName).getUniqueId()) != 0)) || (GEN_PreventQQRebind && (MiraiMC.getBind(e.getSenderID()) != null))) {
                     // 阻止绑定
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindFailed.replace("%id%", Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName()));
                 } else {
                     // 允许绑定
+                    if (!qqBindConfirmMap.containsKey(e.getSenderID()) || !playerName.equals(qqBindConfirmMap.get(e.getSenderID()))) {
+                        String msg = BukkitPlugin.getInstance().getConfig().getString("bot.messages.bind-confirm", "你确定要以名字<name>申请白名单吗？");
+                        msg = msg.replace("<name>", playerName);
+                        MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
+                        qqBindConfirmMap.put(e.getSenderID(), playerName);
+                        return;
+                    }
+                    qqBindConfirmMap.remove(e.getSenderID());
                     MiraiMC.addBind(Bukkit.getOfflinePlayer(playerName).getUniqueId(), e.getSenderID());
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindSuccess);
                 }
             } else {
+                if (!qqBindConfirmMap.containsKey(e.getSenderID()) || !playerName.equals(qqBindConfirmMap.get(e.getSenderID()))) {
+                    String msg = BukkitPlugin.getInstance().getConfig().getString("bot.messages.bind-confirm", "你确定要以名字<name>申请白名单吗？");
+                    msg = msg.replace("<name>", playerName);
+                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
+                    qqBindConfirmMap.put(e.getSenderID(), playerName);
+                    return;
+                }
+                qqBindConfirmMap.remove(e.getSenderID());
                 YamlConfiguration white = YamlConfiguration.loadConfiguration(BukkitPlugin.getWhitelist());
                 if (GEN_UsePlayerName) {
                     List<String> names = white.getStringList("name");

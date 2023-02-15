@@ -35,6 +35,7 @@ public class Config {
 
     public void loadConfig() {
         plugin.saveDefaultConfig();
+        plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
 
         GEN_bStats = config.getBoolean("general.bStats", true);
