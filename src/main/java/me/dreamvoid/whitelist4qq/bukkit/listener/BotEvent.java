@@ -45,7 +45,10 @@ public class BotEvent implements Listener {
             if (!GEN_UseSelfData) {
                 if ((GEN_PreventIDRebind && (MiraiMC.getBind(Bukkit.getOfflinePlayer(playerName).getUniqueId()) != 0)) || (GEN_PreventQQRebind && (MiraiMC.getBind(e.getSenderID()) != null))) {
                     // 阻止绑定
-                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindFailed.replace("%id%", Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName()));
+                    String id = Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName();
+                    if (id == null)
+                        id = "null";
+                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindFailed.replace("%id%", id));
                 } else {
                     // 允许绑定
                     if (!qqBindConfirmMap.containsKey(e.getSenderID()) || !playerName.equals(qqBindConfirmMap.get(e.getSenderID()))) {
