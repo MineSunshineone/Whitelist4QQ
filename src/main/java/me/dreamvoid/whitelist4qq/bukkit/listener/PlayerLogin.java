@@ -11,6 +11,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static me.dreamvoid.whitelist4qq.bukkit.Config.*;
 
@@ -18,13 +19,17 @@ import static me.dreamvoid.whitelist4qq.bukkit.Config.*;
  * 玩家即将加入服务器事件
  */
 public class PlayerLogin implements Listener {
+
     @EventHandler
     public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
         boolean allow = false;
 
+        UUID uuid = e.getUniqueId();
+        if (uuid == null)
+            allow = true;
         if (GEN_CheckRange_JOIN) { // 加入服务器的时候检测
             if (!(GEN_UseSelfData)) {
-                long binder = MiraiMC.getBind(e.getUniqueId());
+                long binder = MiraiMC.getBind(uuid);
                 if (binder != 0) {
                     // 是否需要进一步检测是否在群内
                     if (BOT_CheckQQInGroup) {

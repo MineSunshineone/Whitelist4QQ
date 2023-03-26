@@ -35,7 +35,7 @@ public class BotEvent implements Listener {
     public void onGroupMessage(MiraiGroupMessageEvent e) {
         if (BOT_UsedBotAccounts.contains(e.getBotID()) && BOT_UsedGroupAccounts.contains(e.getGroupID()) && BOT_UseGroupMessageCommand && e.getMessage().startsWith(BOT_BindCommandPrefix)) {
             String playerName = e.getMessage().replace(BOT_BindCommandPrefix, "");
-            playerName = playerName.replace(" ", "");
+            playerName = playerName.replaceAll("\\s", "");
             Matcher matcher = pattern.matcher(playerName);
             if (!matcher.find()) {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BukkitPlugin.getInstance().getConfig().getString("bot.messages.bind-failed-unsafe-name", "绑定失败，不合法的正版用户名"));
