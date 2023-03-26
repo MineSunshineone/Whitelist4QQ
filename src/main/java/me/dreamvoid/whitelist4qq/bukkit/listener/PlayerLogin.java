@@ -3,6 +3,7 @@ package me.dreamvoid.whitelist4qq.bukkit.listener;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.whitelist4qq.bukkit.BukkitPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
@@ -25,8 +26,9 @@ public class PlayerLogin implements Listener {
         boolean allow = false;
 
         UUID uuid = e.getUniqueId();
-        if (uuid == null)
-            allow = true;
+        if (uuid == null) {
+            uuid = Bukkit.getOfflinePlayer(e.getName()).getUniqueId();
+        }
         if (GEN_CheckRange_JOIN) { // 加入服务器的时候检测
             if (!(GEN_UseSelfData)) {
                 long binder = MiraiMC.getBind(uuid);
@@ -55,7 +57,7 @@ public class PlayerLogin implements Listener {
                     allow = names.contains(e.getName());
                 } else {
                     List<String> uuids = white.getStringList("uuid");
-                    allow = uuids.contains(e.getUniqueId().toString());
+                    allow = uuids.contains(uuid.toString());
                 }
             }
 
