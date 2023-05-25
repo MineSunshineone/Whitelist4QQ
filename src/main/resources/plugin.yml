@@ -6,6 +6,7 @@ authors:
 version: ${project.version}
 description: Whitelist for QQ with MiraiMC.
 api-version: 1.13
+folia-supported: true
 depend:
   - MiraiMC
 commands:

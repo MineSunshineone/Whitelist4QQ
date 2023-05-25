@@ -1,11 +1,7 @@
 package me.dreamvoid.whitelist4qq.bukkit;
 
 import me.dreamvoid.miraimc.api.MiraiMC;
-import me.dreamvoid.whitelist4qq.bukkit.listener.BotEvent;
-import me.dreamvoid.whitelist4qq.bukkit.listener.PlayerActions;
-import me.dreamvoid.whitelist4qq.bukkit.listener.PlayerJoin;
-import me.dreamvoid.whitelist4qq.bukkit.listener.PlayerLogin;
-import me.dreamvoid.whitelist4qq.bukkit.runable.AsyncCheckBind;
+import me.dreamvoid.whitelist4qq.bukkit.listener.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -57,8 +53,9 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PlayerLogin(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoin(this), this);
         if(GEN_CheckRange_ACTION) Bukkit.getPluginManager().registerEvents(new PlayerActions(this), this);
-        Bukkit.getPluginManager().registerEvents(new BotEvent(), this);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new AsyncCheckBind(this, this), 0L, 60L);
+        Bukkit.getPluginManager().registerEvents(new BukkitBotEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new FoliaBotEvent(), this);
+//        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new AsyncCheckBind(this, this), 0L, 60L);
         if (GEN_bStats) new Metrics(this, 13112);
 
         if(GEN_UseSelfData){

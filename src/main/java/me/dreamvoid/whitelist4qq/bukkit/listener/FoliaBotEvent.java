@@ -2,8 +2,8 @@ package me.dreamvoid.whitelist4qq.bukkit.listener;
 
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
-import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
-import me.dreamvoid.miraimc.bukkit.event.message.passive.MiraiGroupMessageEvent;
+import com.github.yufiriamazenta.miraimc.folia.event.group.member.MiraiMemberLeaveEvent;
+import com.github.yufiriamazenta.miraimc.folia.event.message.passive.MiraiGroupMessageEvent;
 import me.dreamvoid.whitelist4qq.bukkit.BukkitPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,12 +22,12 @@ import static me.dreamvoid.whitelist4qq.bukkit.Config.*;
 /**
  * 机器人事件
  */
-public class BotEvent implements Listener {
+public class FoliaBotEvent implements Listener {
 
     private final Pattern pattern = Pattern.compile("^[A-Za-z0-9\\\\_]+$");
     private final Map<Long, String> qqBindConfirmMap;
 
-    public BotEvent() {
+    public FoliaBotEvent() {
         qqBindConfirmMap = new ConcurrentHashMap<>();
     }
 
@@ -47,7 +47,7 @@ public class BotEvent implements Listener {
                     // 阻止绑定
                     String id = Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName();
                     if (id == null)
-                        id = "null";
+                        id = MiraiMC.getBind(e.getSenderID()).toString();
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindFailed.replace("%id%", id));
                 } else {
                     // 允许绑定
@@ -59,7 +59,7 @@ public class BotEvent implements Listener {
                         return;
                     }
                     qqBindConfirmMap.remove(e.getSenderID());
-                    MiraiMC.addBind(Bukkit.getOfflinePlayer(playerName).getUniqueId(), e.getSenderID());
+                    MiraiMC.addBinding(playerName, e.getSenderID());
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_Messages_BindSuccess);
                 }
             } else {

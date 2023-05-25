@@ -32,6 +32,11 @@ public class PlayerLogin implements Listener {
         if (GEN_CheckRange_JOIN) { // 加入服务器的时候检测
             if (!(GEN_UseSelfData)) {
                 long binder = MiraiMC.getBind(uuid);
+                boolean isName = false;
+                if (binder == 0) {
+                    binder = MiraiMC.getBinding(e.getName());
+                    isName = true;
+                }
                 if (binder != 0) {
                     // 是否需要进一步检测是否在群内
                     if (BOT_CheckQQInGroup) {
@@ -49,6 +54,10 @@ public class PlayerLogin implements Listener {
                             }
                         }
                     } else allow = true; // 不需要则直接true
+                    if (isName) {
+                        MiraiMC.removeBind(binder);
+                        MiraiMC.addBind(e.getUniqueId(), binder);
+                    }
                 }
             } else {
                 YamlConfiguration white = YamlConfiguration.loadConfiguration(BukkitPlugin.getWhitelist());
