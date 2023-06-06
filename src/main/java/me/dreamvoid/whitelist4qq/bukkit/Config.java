@@ -28,6 +28,13 @@ public class Config {
     public static String BOT_Messages_BindSuccess;
     public static String BOT_Messages_BindFailed;
     public static String BOT_Messages_BindFailedSelfdata;
+    public static String BOT_SELECT_PLAYER_COMMAND;
+    public static String BOT_SELECT_QQ_COMMAND;
+    public static String BOT_MSG_SELECT_QQ_FAILED_NUMBER_FORMAT;
+    public static String BOT_MSG_SELECT_QQ_FAILED_NOT_EXIST;
+    public static String BOT_MSG_SELECT_QQ_SUCCESS;
+    public static String BOT_MSG_SELECT_PLAYER_FAILED_NOT_EXIST;
+    public static String BOT_MSG_SELECT_PLAYER_SUCCESS;
 
     Config(BukkitPlugin plugin) {
         this.plugin = plugin;
@@ -59,5 +66,12 @@ public class Config {
         BOT_Messages_BindSuccess = config.getString("bot.messages.bind-success");
         BOT_Messages_BindFailed = config.getString("bot.messages.bind-failed");
         BOT_Messages_BindFailedSelfdata = config.getString("bot.messages.bind-failed-selfdata");
+        BOT_SELECT_PLAYER_COMMAND = config.getString("bot.select-player-command-prefix", "getplayer");
+        BOT_SELECT_QQ_COMMAND = config.getString("bot.select-qq-command-prefix", "getqq");
+        BOT_MSG_SELECT_QQ_FAILED_NUMBER_FORMAT = config.getString("bot.messages.select-qq-failed-number-format", "");
+        BOT_MSG_SELECT_QQ_FAILED_NOT_EXIST = config.getString("bot.messages.select-qq-failed-not-exist", "");
+        BOT_MSG_SELECT_QQ_SUCCESS = config.getString("bot.messages.select-qq-success", "");
+        BOT_MSG_SELECT_QQ_FAILED_NOT_EXIST = config.getString("bot.messages.select-player-failed-not-exist", "");
+        BOT_MSG_SELECT_QQ_SUCCESS = config.getString("bot.messages.select-player-success", "");
     }
 }

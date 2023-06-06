@@ -6,13 +6,16 @@ import com.github.yufiriamazenta.miraimc.folia.event.group.member.MiraiMemberLea
 import com.github.yufiriamazenta.miraimc.folia.event.message.passive.MiraiGroupMessageEvent;
 import me.dreamvoid.whitelist4qq.bukkit.BukkitPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,6 +103,47 @@ public class FoliaBotEvent implements Listener {
                     }
 
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onSelectPlayer(MiraiGroupMessageEvent e) {
+        if (!BOT_UsedBotAccounts.contains(e.getGroupID()))
+            return;
+        if (!BOT_UsedGroupAccounts.contains(e.getGroupID()))
+            return;
+        if (!e.getMessage().startsWith(BOT_SELECT_PLAYER_COMMAND) && !e.getMessage().startsWith(BOT_SELECT_QQ_COMMAND))
+            return;
+        if (e.getMessage().startsWith(BOT_SELECT_QQ_COMMAND)) {
+            String qqStr = e.getMessage().replace(BOT_SELECT_QQ_COMMAND, "");
+            try {
+                long qq = Long.parseLong(qqStr);
+                UUID bind = MiraiMC.getBind(qq);
+                if (bind == null) {
+                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_MSG_SELECT_QQ_FAILED_NOT_EXIST);
+                } else {
+                    String msg = BOT_MSG_SELECT_QQ_SUCCESS;
+                    msg = msg.replace("%player%", Bukkit.getOfflinePlayer(bind).getName());
+                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
+                }
+            } catch (NumberFormatException exc) {
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_MSG_SELECT_QQ_FAILED_NUMBER_FORMAT);
+            }
+        } else {
+            String player = e.getMessage().replace(BOT_SELECT_PLAYER_COMMAND, "");
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
+            if (offlinePlayer == null) {
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_MSG_SELECT_PLAYER_FAILED_NOT_EXIST);
+                return;
+            }
+            long bind = MiraiMC.getBind(offlinePlayer.getUniqueId());
+            if (bind == 0L) {
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_MSG_SELECT_PLAYER_FAILED_NOT_EXIST);
+            } else {
+                String msg = BOT_MSG_SELECT_PLAYER_SUCCESS;
+                msg = msg.replace("%qq%", bind + "");
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
             }
         }
     }

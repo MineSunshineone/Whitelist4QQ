@@ -86,7 +86,8 @@ bot:
   # 玩家需要发送“消息前缀+自己的ID”才会添加绑定
   # 例如：下方设置为“申请白名单”，玩家的ID是“123456”，则玩家需要在群内发送消息“申请白名单123456”
   bind-command-prefix: "申请白名单"
-
+  select-player-command-prefix: '查询玩家绑定'
+  select-qq-command-prefix: '查询QQ绑定'
   # 消息
   # 插件向群内发送的所有消息都在这里配置
   messages:
@@ -107,3 +108,8 @@ bot:
       请联系管理员查看控制台处理！
     bind-failed-unsafe-name: '绑定失败，不合法的正版用户名'
     bind-confirm: '你确定要以名字<name>申请白名单吗？确定请再次输入。如果名字错误，请重新输入新的绑定命令'
+    select-qq-failed-number-format: '查询错误，你查询的内容并不是一个QQ号'
+    select-qq-failed-not-exist: '查询完成，不存在此QQ绑定的玩家'
+    select-qq-success: '查询完成，此QQ绑定的玩家为%player%'
+    select-player-failed-not-exist: '查询完成，此玩家没有绑定QQ号'
+    select-player-success: '查询完成，该玩家绑定的QQ为%qq%'
