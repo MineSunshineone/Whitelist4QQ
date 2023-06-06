@@ -108,7 +108,7 @@ public class BukkitBotEvent implements Listener {
 
     @EventHandler
     public void onSelectPlayer(com.github.yufiriamazenta.miraimc.folia.event.message.passive.MiraiGroupMessageEvent e) {
-        if (!BOT_UsedBotAccounts.contains(e.getGroupID()))
+        if (!BOT_UsedBotAccounts.contains(e.getBotID()))
             return;
         if (!BOT_UsedGroupAccounts.contains(e.getGroupID()))
             return;
@@ -116,6 +116,7 @@ public class BukkitBotEvent implements Listener {
             return;
         if (e.getMessage().startsWith(BOT_SELECT_QQ_COMMAND)) {
             String qqStr = e.getMessage().replace(BOT_SELECT_QQ_COMMAND, "");
+            qqStr = qqStr.replaceAll("\\s", "");
             try {
                 long qq = Long.parseLong(qqStr);
                 UUID bind = MiraiMC.getBind(qq);
@@ -131,6 +132,7 @@ public class BukkitBotEvent implements Listener {
             }
         } else {
             String player = e.getMessage().replace(BOT_SELECT_PLAYER_COMMAND, "");
+            player = player.replaceAll("\\s", "");
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
             if (offlinePlayer == null) {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(BOT_MSG_SELECT_PLAYER_FAILED_NOT_EXIST);
