@@ -9,6 +9,7 @@ general:
   kick-message: |-
     &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
     &c申请方式：在群内发送“申请白名单%code%”
+    &c有效时长5分钟
   kick-message-not-in-group: |-
     &c你不在本服的群中，无法加入服务器
 

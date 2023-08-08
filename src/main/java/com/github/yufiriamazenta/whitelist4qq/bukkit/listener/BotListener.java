@@ -27,12 +27,6 @@ public enum BotListener implements Listener {
     @EventHandler
     public void onGroupMessage(MiraiGroupMessageEvent e) {
         YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
-        if (MiraiMC.getBind(e.getSenderID()) != null) {
-            String boundMsg = config.getString("bot.messages.bind-failed.bound", "bot.messages.bind-failed.bound");
-            boundMsg = boundMsg.replace("%player%", Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName());
-            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(boundMsg);
-            return;
-        }
 
         if (!config.getLongList("bot.used-bot-accounts").contains(e.getBotID()))
             return;
@@ -40,6 +34,12 @@ public enum BotListener implements Listener {
             return;
         if (!e.getMessage().startsWith(config.getString("bot.bind-command-prefix")))
             return;
+        if (MiraiMC.getBind(e.getSenderID()) != null) {
+            String boundMsg = config.getString("bot.messages.bind-failed.bound", "bot.messages.bind-failed.bound");
+            boundMsg = boundMsg.replace("%player%", Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName());
+            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(boundMsg);
+            return;
+        }
         String bindCode = e.getMessage().replace(config.getString("bot.bind-command-prefix"), "");
         bindCode = bindCode.replace("\\s", "");
 
