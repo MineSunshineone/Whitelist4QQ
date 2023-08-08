@@ -6,7 +6,7 @@
 
     <groupId>io.github.dreamvoid</groupId>
     <artifactId>Whitelist4QQ</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -52,16 +52,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.YufiriaMazenta.MiraiMC</groupId>
-            <artifactId>MiraiMC-Folia</artifactId>
-            <version>8f7c9c5691</version>
+            <groupId>io.github.dreamvoid</groupId>
+            <artifactId>MiraiMC-Integration</artifactId>
+            <version>1.8-rc2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.YufiriaMazenta.MiraiMC</groupId>
-            <artifactId>MiraiMC-Bukkit</artifactId>
-            <version>8f7c9c5691</version>
-            <scope>provided</scope>
+            <groupId>com.github.YufiriaMazenta</groupId>
+            <artifactId>ParettiaLib</artifactId>
+            <version>c146db9a75</version>
         </dependency>
     </dependencies>
 </project>

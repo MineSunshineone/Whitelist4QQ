@@ -1,31 +1,5 @@
-#  _          __  _   _   _   _____   _____   _       _   _____   _____   _   _   _____     _____
-# | |        / / | | | | | | |_   _| | ____| | |     | | /  ___/ |_   _| | | | | /  _  \   /  _  \
-# | |  __   / /  | |_| | | |   | |   | |__   | |     | | | |___    | |   | |_| | | | | |   | | | |
-# | | /  | / /   |  _  | | |   | |   |  __|  | |     | | \___  \   | |   \___  | | | | |   | | | |
-# | |/   |/ /    | | | | | |   | |   | |___  | |___  | |  ___| |   | |       | | | |_| |_  | |_| |_
-# |___/|___/     |_| |_| |_|   |_|   |_____| |_____| |_| /_____/   |_|       |_| \_______| \_______|
-#  Whitelist4QQ 配置文件
-#
-# 作者：xingxing520, DreamVoid
-# Github: https://github.com/DreamVoid/Whitelist4QQ
-
 # 插件配置
 general:
-  # 允许 bStats 统计
-  bStats: true
-
-  # 白名单范围
-  # join - 加入服务器 - 玩家加入服务器时检测是否在 MiraiMC 的绑定数据库，如果不在则踢出
-  # action - 操作 - 玩家可以加入服务器，但如果不在 MiraiMC 的绑定数据库中则会阻止玩家进行任何操作
-  # spec - 旁观者 - 玩家可以加入服务器，但游戏模式将设为旁观者模式。如果 action 同时启用，则不阻止玩家移动。获取白名单后游戏模式将设为 server.prop 设置的默认模式。
-  # 注：join 只在玩家加入服务器时检测1次。action 和 spec 在玩家不在数据库中时每 10 秒检测 1 次，如果在数据库就只检测 1 次。
-  check-range:
-    join: true
-    action: false
-    spec: false
-
-  # 阻止已经绑定过 QQ 的 ID 重复绑定
-  prevent-id-rebind: true
 
   # 阻止已经绑定过 ID 的 QQ 重复绑定
   prevent-qq-rebind: true
@@ -33,28 +7,10 @@ general:
   # 踢出信息。在踢出不在 MiraiMC 数据库的玩家时显示的踢出消息
   # 默认提示消息使用的是 YAML 换行符，如果想使用单行消息可以设为 kick-message: "消息内容"
   kick-message: |-
-    &c你不在本服的白名单中，请加入我们的QQ群进行申请
-    &cQQ群：123456
-
-  # 游戏内消息提示。仅当 check-range 中的 join 设为 false（即允许玩家进入服务器）时才会出现。
-  # 默认每3秒提示一次
-  notify-message: |-
-    &b========================================
-    &e你不在本服的白名单内，将无法进行绝大多数操作
-    &e要获取本服的白名单，请加入我们的QQ群进行申请
-    &eQQ群：123456
-    &e如果你已经获取白名单，请稍等片刻或重新进入服务器
-    &b========================================
-
-  # 验证成功提示
-  bind-success-message: "&a你成功获取了白名单，现在可以正常游玩服务器了！"
-  
-  # 是否不使用MiraiMC的数据库而改为插件自存储
-  use-self-data: false
-  
-  # 是否使用玩家名存储数据而非UUID
-  # 由于MiraiMC特性，此项只会在use-self-data为true时生效
-  use-player-name: false
+    &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
+    &c申请方式：在群内发送“申请白名单%code%”
+  kick-message-not-in-group: |-
+    &c你不在本服的群中，无法加入服务器
 
 # 机器人配置
 bot:
@@ -77,14 +33,8 @@ bot:
   # 建议设为 false，这样一来就算熊孩子搞完事退群也有 QQ 留着做记录
   remove-bind-when-qq-quit: false
 
-  # 让 Whitelist4QQ 处理 QQ 群内的绑定命令消息
-  # 如果启用，请勿安装 Link2QQ 插件，避免玩家通过 Link2QQ 插件更换绑定从而绕过服务器管理员的审查
-  # 如果禁用，除非管理员手动为玩家添加绑定，否则玩家将无法自行绑定 QQ，也就无法获得白名单
-  use-group-message-command: true
-
   # 添加绑定消息前缀
-  # 玩家需要发送“消息前缀+自己的ID”才会添加绑定
-  # 例如：下方设置为“申请白名单”，玩家的ID是“123456”，则玩家需要在群内发送消息“申请白名单123456”
+  # 玩家需要发送“消息前缀+绑定码”才会添加绑定
   bind-command-prefix: "申请白名单"
   select-player-command-prefix: '查询玩家绑定'
   select-qq-command-prefix: '查询QQ绑定'
@@ -92,22 +42,15 @@ bot:
   # 插件向群内发送的所有消息都在这里配置
   messages:
     # 绑定成功
-    bind-success: "绑定成功，现在你可以游玩本服务器了！"
+    bind-success: "您已成功绑定玩家%player%，现在你可以游玩本服务器了！"
 
     # 绑定失败
     # 无论绑定失败的原因是什么，都只会发这一条
     # 可用变量：%id% - QQ绑定的ID（use-self-data为true时不可用）
-    bind-failed: |-
-      绑定失败，此ID可能已经绑定另一个QQ，或你的QQ已经绑定了一个ID，请联系管理员处理！
-      此QQ绑定的ID：%id%
-    
-    # 由于数据库原因绑定失败
-    # 只会出现在use-self-data为true时
-    bind-failed-selfdata: |-
-      绑定失败，在保存白名单文件时出现异常！
-      请联系管理员查看控制台处理！
-    bind-failed-unsafe-name: '绑定失败，不合法的正版用户名'
-    bind-confirm: '你确定要以名字<name>申请白名单吗？确定请再次输入。如果名字错误，请重新输入新的绑定命令'
+    bind-failed:
+      not-exist-code: '不存在此绑定码'
+      bound: '你已经绑定了一个游戏账号%player%，无法重复绑定'
+
     select-qq-failed-number-format: '查询错误，你查询的内容并不是一个QQ号'
     select-qq-failed-not-exist: '查询完成，不存在此QQ绑定的玩家'
     select-qq-success: '查询完成，此QQ绑定的玩家为%player%'

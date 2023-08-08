@@ -1,4 +1,4 @@
-package me.dreamvoid.whitelist4qq.bukkit;
+package com.github.yufiriamazenta.whitelist4qq.bukkit;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

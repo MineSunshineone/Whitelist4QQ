@@ -1,7 +1,7 @@
 name: Whitelist4QQ
-main: me.dreamvoid.whitelist4qq.bukkit.BukkitPlugin
+main: com.github.yufiriamazenta.whitelist4qq.bukkit.Whitelist4QQ
 authors:
-  - xingxing520
+  - YufiriaMazenta
   - DreamVoid
 version: ${project.version}
 description: Whitelist for QQ with MiraiMC.
@@ -9,6 +9,7 @@ api-version: 1.13
 folia-supported: true
 depend:
   - MiraiMC
+  - ParettiaLib
 commands:
    whitelist4qq:
      description: Whitelist4QQ main command.
