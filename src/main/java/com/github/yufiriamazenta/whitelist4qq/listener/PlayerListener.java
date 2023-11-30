@@ -4,6 +4,7 @@ import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.listener.BukkitListener;
+import crypticlib.util.MsgUtil;
 import crypticlib.util.TextUtil;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
@@ -15,7 +16,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.*;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 玩家相关事件监听
@@ -24,6 +27,7 @@ import java.util.UUID;
 public enum PlayerListener implements Listener {
 
     INSTANCE;
+    private Map<UUID, Long> visitorChatTimeMap = new ConcurrentHashMap<>();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerLoginOnWhitelistMode1(AsyncPlayerPreLoginEvent event) {
@@ -148,6 +152,42 @@ public enum PlayerListener implements Listener {
         if (!WhitelistManager.hasVisitTag(player))
             return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVisitorChat(AsyncPlayerChatEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        Player player = event.getPlayer();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        if (visitorChatTimeMap.containsKey(player.getUniqueId())) {
+            long time = System.currentTimeMillis();
+            long lastChatTime = visitorChatTimeMap.get(player.getUniqueId());
+            int chatCd = Configs.mode2VisitorChatCd.value() * 1000;
+            if (time - lastChatTime < chatCd) {
+                MsgUtil.sendMsg(player, Configs.messagesVisitorChatInCd.value());
+                event.setCancelled(true);
+                return;
+            }
+            visitorChatTimeMap.put(player.getUniqueId(), time);
+        } else {
+            visitorChatTimeMap.put(player.getUniqueId(), System.currentTimeMillis());
+        }
+    }
+
+    @EventHandler
+    public void onVisitorQuit(PlayerQuitEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        Player player = event.getPlayer();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        visitorChatTimeMap.remove(player.getUniqueId());
+    }
+
+    public Map<UUID, Long> getVisitorChatTimeMap() {
+        return visitorChatTimeMap;
     }
 
 }

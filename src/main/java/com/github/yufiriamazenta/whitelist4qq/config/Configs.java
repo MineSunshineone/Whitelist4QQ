@@ -27,9 +27,12 @@ public class Configs {
     public static final StringConfigEntry messagesBotMessageSelectQQSuccess = new StringConfigEntry("messages.bot_message.select_qq_success", "查询完成，此QQ绑定的玩家为%player%");
     public static final StringConfigEntry messagesBotMessageSelectPlayerFailedNotExist = new StringConfigEntry("messages.bot_message.select_player_failed_not_exist", "查询完成，此玩家没有绑定QQ号");
     public static final StringConfigEntry messagesBotMessageSelectPlayerSuccess = new StringConfigEntry("messages.bot_message.select_player_success", "查询完成，该玩家绑定的QQ为%qq%");
+    public static final StringConfigEntry messagesCommandPlayerOnly = new StringConfigEntry("messages.command.player_only", "&a此命令只允许玩家使用");
     public static final StringConfigEntry messagesCommandReload = new StringConfigEntry("messages.command.reload", "&a已重载Whitelist4QQ");
     public static final StringConfigEntry messagesCommandRemoveUsage = new StringConfigEntry("messages.command.remove.usage", "&c用法：/whitelist4qq remove <玩家名>");
     public static final StringConfigEntry messagesCommandRemoveSuccess = new StringConfigEntry("messages.command.remove.success", "&a已移除指定玩家的绑定！");
+    public static final StringConfigEntry messagesCommandBindBound = new StringConfigEntry("messages.command.bind.bound", "&a您已经绑定过，无需再次绑定");
+    public static final StringConfigEntry messagesCommandBindWait = new StringConfigEntry("messages.command.bind.wait", "&a您的绑定码为%code%，请在群内使用“申请白名单%code%”进行申请");
     public static final BooleanConfigEntry preventQQRebind = new BooleanConfigEntry("prevent_qq_rebind", true);
     public static final LongListConfigEntry usedBotAccounts = new LongListConfigEntry("used_bot_accounts", new ArrayList<>(Arrays.asList(123456789L, 23456789L)));
     public static final LongListConfigEntry usedGroups = new LongListConfigEntry("used_groups", new ArrayList<>(Arrays.asList(123456789L, 23456789L)));
@@ -42,7 +45,9 @@ public class Configs {
     public static final StringConfigEntry selectQQCommandPrefix = new StringConfigEntry("select_qq_command_prefix", "查询QQ绑定");
     public static final IntConfigEntry codeTimeoutSecond = new IntConfigEntry("code_timeout_second", 300);
     public static final IntConfigEntry mode2HintCd = new IntConfigEntry("mode_2_hint_cd", 30);
-    public static final StringConfigEntry messagesMode2BindHintMessage = new StringConfigEntry("messages.mode_2_bind_hint_message", "&a如果您觉得我们服务器不错,可以使用命令申请白名单噢");
+    public static final StringConfigEntry messagesMode2BindHintMessage = new StringConfigEntry("messages.mode_2_bind_hint_message", "&a如果您觉得我们服务器不错,可以使用命令/bind申请白名单噢");
+    public static final IntConfigEntry mode2VisitorChatCd = new IntConfigEntry("mode_2_visitor_chat_cd", 10);
+    public static final StringConfigEntry messagesVisitorChatInCd = new StringConfigEntry("messages.visitor_chat_in_cd", "&c您当前只能每10秒发送一条消息");
 
     public static void reload() {
         Whitelist4QQ.instance().reloadConfig();

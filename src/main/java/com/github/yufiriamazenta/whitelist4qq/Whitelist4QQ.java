@@ -96,6 +96,40 @@ public class Whitelist4QQ extends BukkitPlugin {
                 new String[]{"qwl", "qwhitelist"},
                 "Whitelist4QQ main command.")
             );
+        new RootCmdExecutor()
+            .setExecutor((sender, args) -> {
+                if (!(sender instanceof Player)) {
+                    MsgUtil.sendMsg(sender, Configs.messagesCommandPlayerOnly.value());
+                    return true;
+                }
+                if (whitelistMode != 2)
+                    return true;
+                Player player = (Player) sender;
+                if (!WhitelistManager.hasVisitTag(player)) {
+                    MsgUtil.sendMsg(player, Configs.messagesCommandBindBound.value());
+                    return true;
+                }
+                CrypticLib.platform().scheduler().runTaskAsync(this, () -> {
+                    UUID uuid = player.getUniqueId();
+                    String code;
+                    if (WhitelistManager.getReverseBindCodeMap().containsKey(uuid)) {
+                        code = WhitelistManager.getReverseBindCodeMap().get(uuid);
+                    } else {
+                        code = UUID.randomUUID().toString();
+                        code = code.substring(code.length() - 6);
+                        WhitelistManager.addBindCodeCache(code, uuid);
+                    }
+                    String bindHintMsg = TextUtil.color(Configs.messagesCommandBindWait.value().replace("%code%", code));
+                    CrypticLib.platform().scheduler().runTask(this, () -> {
+                        MsgUtil.sendMsg(player, bindHintMsg);
+                    });
+                });
+                return true;
+            }).register(this, new CommandInfo(
+                "bind",
+            null,
+            new String[]{"bd"})
+            );
     }
 
     @Override

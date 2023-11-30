@@ -61,7 +61,7 @@ public enum BotListener implements Listener {
             .replace(Configs.bindCommandPrefix.value(), "")
             .replace("\\s", "");
 
-        //如果没有对应检测码则提示绑定失败
+        //如果没有对应绑定码则提示绑定失败
         if (!WhitelistManager.getBindCodeMap().containsKey(bindCode)) {
             MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageBindFailedNotExistCode.value());
             return;

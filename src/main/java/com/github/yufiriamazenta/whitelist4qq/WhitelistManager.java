@@ -1,6 +1,7 @@
 package com.github.yufiriamazenta.whitelist4qq;
 
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+import com.github.yufiriamazenta.whitelist4qq.listener.PlayerListener;
 import crypticlib.CrypticLib;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
@@ -60,10 +61,13 @@ public class WhitelistManager {
         UUID bindUuid = bindCodeMap.get(bindCode);
         MiraiMC.addBind(bindUuid, bindQQ);
         removeBindCodeCache(bindCode);
+        PlayerListener.INSTANCE.getVisitorChatTimeMap().remove(bindUuid);
         if (Whitelist4QQ.instance().whitelistMode() == 2) {
-            Player player = Bukkit.getPlayer(bindUuid);
-            if (player != null)
-                removeVisitTag2Player(player);
+            CrypticLib.platform().scheduler().runTask(Whitelist4QQ.instance(), () -> {
+                Player player = Bukkit.getPlayer(bindUuid);
+                if (player != null)
+                    removeVisitTag2Player(player);
+            });
         }
     }
 
