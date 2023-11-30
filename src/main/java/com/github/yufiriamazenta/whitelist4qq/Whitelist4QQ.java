@@ -5,6 +5,7 @@ import crypticlib.BukkitPlugin;
 import crypticlib.CrypticLib;
 import crypticlib.command.CommandInfo;
 import crypticlib.command.impl.RootCmdExecutor;
+import crypticlib.config.impl.YamlConfigWrapper;
 import crypticlib.util.MsgUtil;
 import crypticlib.util.TextUtil;
 import me.dreamvoid.miraimc.api.MiraiMC;
@@ -14,6 +15,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -21,6 +23,7 @@ import static crypticlib.command.CommandManager.subcommand;
 
 public class Whitelist4QQ extends BukkitPlugin {
     private static Whitelist4QQ INSTANCE;
+    private final YamlConfigWrapper pluginConfig = new YamlConfigWrapper(this, "config.yml");
     private int whitelistMode;
     private int taskRunSecond = 0;
 
@@ -34,7 +37,6 @@ public class Whitelist4QQ extends BukkitPlugin {
 
     @Override
     public void enable() {
-        saveDefaultConfig();
         Configs.reload();
 
         this.whitelistMode = Configs.whitelistMode.value();
@@ -137,8 +139,13 @@ public class Whitelist4QQ extends BukkitPlugin {
     }
 
     @Override
-    public FileConfiguration getConfig() {
-        return super.getConfig();
+    public @NotNull FileConfiguration getConfig() {
+        return pluginConfig.config();
+    }
+
+    @Override
+    public void saveConfig() {
+        pluginConfig.saveConfig();
     }
 
     public int whitelistMode() {
