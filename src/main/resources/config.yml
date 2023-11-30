@@ -12,6 +12,9 @@ general:
     &c有效时长5分钟
   kick-message-not-in-group: |-
     &c你不在本服的群中，无法加入服务器
+  # 白名单模式,1为阻止进入,2为允许进入,但无法进行交互
+  whitelist_mode: 1
+  allow_visit_second: 600
 
 # 机器人配置
 bot:

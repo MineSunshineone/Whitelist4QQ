@@ -1,7 +1,8 @@
-package com.github.yufiriamazenta.whitelist4qq.bukkit.listener;
+package com.github.yufiriamazenta.whitelist4qq.listener;
 
-import com.github.yufiriamazenta.whitelist4qq.bukkit.Whitelist4QQ;
-import com.github.yufiriamazenta.whitelist4qq.bukkit.WhitelistManager;
+import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
+import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
+import crypticlib.listener.BukkitListener;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
@@ -12,14 +13,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 /**
  * 机器人相关事件监听
  */
+@BukkitListener
 public enum BotListener implements Listener {
 
     INSTANCE;

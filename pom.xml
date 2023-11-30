@@ -6,7 +6,7 @@
 
     <groupId>io.github.dreamvoid</groupId>
     <artifactId>Whitelist4QQ</artifactId>
-    <version>1.5</version>
+    <version>1.6-dev1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -16,6 +16,30 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <minimizeJar>false</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>crypticlib</pattern>
+                            <shadedPattern>com.github.yufiriamazenta.whitelist4qq.lib</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -33,8 +57,8 @@
     <repositories>
         <!-- This adds the Spigot Maven repository to the build -->
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>crypticlib</id>
+            <url>http://repo.crypticlib.com:8081/repository/maven-public/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -58,9 +82,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.YufiriaMazenta</groupId>
-            <artifactId>ParettiaLib</artifactId>
-            <version>c146db9a75</version>
+            <groupId>com.crypticlib</groupId>
+            <artifactId>common</artifactId>
+            <version>0.3.7</version>
         </dependency>
     </dependencies>
 </project>

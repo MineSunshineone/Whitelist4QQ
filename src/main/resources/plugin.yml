@@ -9,14 +9,6 @@ api-version: 1.13
 folia-supported: true
 depend:
   - MiraiMC
-  - ParettiaLib
-commands:
-   whitelist4qq:
-     description: Whitelist4QQ main command.
-     permission: whitelist4qq.command.whitelist4qq
-     aliases:
-       - qwhitelist
-       - qwl
 permissions:
   whitelist4qq.*:
     default: op
@@ -24,12 +16,12 @@ permissions:
       whitelist4qq.command.*:
         default: op
         children:
-          whitelist4qq.command.whitelist4qq:
+          whitelist4qq.command:
             description: Allow use /whitelist4qq
             default: true
-          whitelist4qq.command.whitelist4qq.reload:
+          whitelist4qq.command.reload:
             default: op
             description: Allow use /whitelist4qq reload
-          whitelist4qq.command.whitelist4qq.remove:
+          whitelist4qq.command.remove:
             default: op
             description: Allow use /whitelist4qq remove
