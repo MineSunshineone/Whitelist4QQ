@@ -41,6 +41,8 @@ public class Configs {
     public static final StringConfigEntry selectPlayerCommandPrefix = new StringConfigEntry("select_player_command_prefix", "查询玩家绑定");
     public static final StringConfigEntry selectQQCommandPrefix = new StringConfigEntry("select_qq_command_prefix", "查询QQ绑定");
     public static final IntConfigEntry codeTimeoutSecond = new IntConfigEntry("code_timeout_second", 300);
+    public static final IntConfigEntry mode2HintCd = new IntConfigEntry("mode_2_hint_cd", 30);
+    public static final StringConfigEntry messagesMode2BindHintMessage = new StringConfigEntry("messages.mode_2_bind_hint_message", "&a如果您觉得我们服务器不错,可以使用命令申请白名单噢");
 
     public static void reload() {
         Whitelist4QQ.instance().reloadConfig();

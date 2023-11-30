@@ -20,6 +20,8 @@ whitelist_mode: 1
 mode_2_allow_visit_second: 600
 #白名单模式2下参观者发言的间隔,单位为秒
 mode_2_visit_chat_cd: 10
+#白名单模式2下给参观者提示绑定白名单的间隔,单位为秒
+mode_2_hint_cd: 30
 #检测玩家是否在群内
 check_qq_in_group: true
 #玩家退群时删除白名单
@@ -53,3 +55,4 @@ messages:
     select_qq_success: "查询完成，此QQ绑定的玩家为%player%"
     select_player_failed_not_exist: "查询完成，此玩家没有绑定QQ号"
     select_player_success: "查询完成，该玩家绑定的QQ为%qq%"
+  mode_2_bind_hint_message: "&a如果您觉得我们服务器不错,可以使用命令申请白名单噢"

@@ -9,6 +9,7 @@ import crypticlib.util.MsgUtil;
 import crypticlib.util.TextUtil;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,6 +22,7 @@ import static crypticlib.command.CommandManager.subcommand;
 public class Whitelist4QQ extends BukkitPlugin {
     private static Whitelist4QQ INSTANCE;
     private int whitelistMode;
+    private int taskRunSecond = 0;
 
     public Whitelist4QQ() {
         INSTANCE = this;
@@ -42,8 +44,14 @@ public class Whitelist4QQ extends BukkitPlugin {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!WhitelistManager.hasVisitTag(player))
                     continue;
+                player.setGameMode(GameMode.ADVENTURE);
                 long playedTime = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
                 long allowVisitTime = Configs.mode2AllowVisitSecond.value() * 20;
+                if (taskRunSecond >= Configs.mode2HintCd.value()) {
+                    MsgUtil.sendMsg(player, Configs.messagesMode2BindHintMessage.value());
+                    taskRunSecond = 0;
+                }
+
                 if (playedTime >= allowVisitTime) {
                     String code;
                     if (WhitelistManager.getReverseBindCodeMap().containsKey(player.getUniqueId())) {
@@ -57,6 +65,7 @@ public class Whitelist4QQ extends BukkitPlugin {
                     player.kickPlayer(bindHintMsg);
                 }
             }
+            taskRunSecond++;
         }, 1, 20);
         new RootCmdExecutor()
             .regSub(subcommand("reload")

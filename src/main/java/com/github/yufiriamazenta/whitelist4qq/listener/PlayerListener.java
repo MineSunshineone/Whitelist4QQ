@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.*;
 
@@ -77,7 +78,6 @@ public enum PlayerListener implements Listener {
                     event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(bindHintMsg));
                     return;
                 }
-                player.setGameMode(GameMode.ADVENTURE);
                 WhitelistManager.addVisitTag2Player(player);
                 break;
             case NOT_IN_GROUP:
@@ -132,6 +132,19 @@ public enum PlayerListener implements Listener {
             return;
         }
         Player player = (Player) event.getEntity();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVisitorDamageEntity(EntityDamageByEntityEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getDamager();
         if (!WhitelistManager.hasVisitTag(player))
             return;
         event.setCancelled(true);
