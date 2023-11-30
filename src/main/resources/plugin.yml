@@ -1,11 +1,11 @@
 name: Whitelist4QQ
-main: com.github.yufiriamazenta.whitelist4qq.bukkit.Whitelist4QQ
+main: com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ
 authors:
   - YufiriaMazenta
   - DreamVoid
 version: ${project.version}
 description: Whitelist for QQ with MiraiMC.
-api-version: 1.13
+api-version: 1.14
 folia-supported: true
 depend:
   - MiraiMC

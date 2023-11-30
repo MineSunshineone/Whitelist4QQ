@@ -1,10 +1,16 @@
 package com.github.yufiriamazenta.whitelist4qq;
 
+import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.CrypticLib;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.api.bot.MiraiGroup;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,11 +22,12 @@ public class WhitelistManager {
     private static final Map<String, UUID> bindCodeMap = new ConcurrentHashMap<>();
     private static final Map<String, Long> bindCodeTimeStampMap = new ConcurrentHashMap<>();
     private static final Map<UUID, String> reverseBindCodeMap = new ConcurrentHashMap<>();
+    public static final NamespacedKey PLAYER_VISIT_TAG_KEY = new NamespacedKey(Whitelist4QQ.instance(), "visit");
 
     static {
-        CrypticLib.platform().scheduler().runTaskTimer(Whitelist4QQ.getInstance(), () -> {
+        CrypticLib.platform().scheduler().runTaskTimer(Whitelist4QQ.instance(), () -> {
             long timeStamp = System.currentTimeMillis();
-            long timeout = Whitelist4QQ.getInstance().getConfig().getLong("codeTimeoutSecond", 300L) * 1000;
+            long timeout = Configs.codeTimeoutSecond.value() * 1000;
             for (String key : bindCodeTimeStampMap.keySet()) {
                 if (timeStamp - bindCodeTimeStampMap.get(key) >= timeout) {
                     removeBindCodeCache(key);
@@ -49,6 +56,39 @@ public class WhitelistManager {
         bindCodeTimeStampMap.remove(code);
     }
 
+    public static void addBind(long bindQQ, String bindCode) {
+        UUID bindUuid = bindCodeMap.get(bindCode);
+        MiraiMC.addBind(bindUuid, bindQQ);
+        removeBindCodeCache(bindCode);
+        if (Whitelist4QQ.instance().whitelistMode() == 2) {
+            Player player = Bukkit.getPlayer(bindUuid);
+            if (player != null)
+                removeVisitTag2Player(player);
+        }
+    }
+
+    public static boolean hasVisitTag(Player player) {
+        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+        return dataContainer.has(WhitelistManager.PLAYER_VISIT_TAG_KEY, PersistentDataType.BYTE);
+    }
+
+    public static void addVisitTag2Player(Player player) {
+        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+        if (hasVisitTag(player)) {
+            return;
+        }
+        dataContainer.set(WhitelistManager.PLAYER_VISIT_TAG_KEY, PersistentDataType.BYTE, (byte) 1);
+    }
+
+    public static void removeVisitTag2Player(Player player) {
+        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+        if (!hasVisitTag(player)) {
+            return;
+        }
+        dataContainer.remove(WhitelistManager.PLAYER_VISIT_TAG_KEY);
+        player.setGameMode(GameMode.SURVIVAL);
+    }
+
     /**
      * 判断是否有白名单
      * @param uuid 判断的uuid
@@ -58,16 +98,38 @@ public class WhitelistManager {
         long bindQQ = MiraiMC.getBind(uuid);
         if (bindQQ == 0L)
             return WhitelistState.NO_WHITELIST;
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
-        if (!config.getBoolean("bot.check-qq-in-group")) {
+
+        if (!Configs.checkQQInGroup.value()) {
             return WhitelistState.HAS_WHITELIST;
         }
-        for (long bot : config.getLongList("bot.used-bot-accounts")) {
-            for (Long group : config.getLongList("bot.used-group-numbers")) {
+        for (long bot : Configs.usedBotAccounts.value()) {
+            for (Long group : Configs.usedGroups.value()) {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
                     MiraiGroup group1 = miraiBot.getGroup(group);
                     if (group1.contains(bindQQ))
+                        return WhitelistState.HAS_WHITELIST;
+                } catch (NoSuchElementException ignored) {}
+            }
+        }
+        return WhitelistState.NOT_IN_GROUP;
+    }
+
+    public static WhitelistState getWhitelistState(long qq) {
+        UUID bindPlayer = MiraiMC.getBind(qq);
+        if (bindPlayer == null) {
+            return WhitelistState.NO_WHITELIST;
+        }
+
+        if (!Configs.checkQQInGroup.value()) {
+            return WhitelistState.HAS_WHITELIST;
+        }
+        for (long bot : Configs.usedBotAccounts.value()) {
+            for (Long group : Configs.usedGroups.value()) {
+                try {
+                    MiraiBot miraiBot = MiraiBot.getBot(bot);
+                    MiraiGroup group1 = miraiBot.getGroup(group);
+                    if (group1.contains(qq))
                         return WhitelistState.HAS_WHITELIST;
                 } catch (NoSuchElementException ignored) {}
             }

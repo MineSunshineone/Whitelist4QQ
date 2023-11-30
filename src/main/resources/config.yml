@@ -1,62 +1,55 @@
-# 插件配置
-general:
+#防止已经绑定过的QQ重新绑定
+prevent_qq_rebind: true
+#群内申请白名单的命令前缀
+bind_command_prefix: "申请白名单"
+#群内查询玩家绑定QQ的命令前缀
+select_player_command_prefix: "查询玩家绑定"
+#群内查询QQ绑定玩家的命令前缀
+select_qq_command_prefix: "查询QQ绑定"
+#用于白名单绑定的机器人
+used_bot_accounts:
+  - 123456
+  - 789012
+#用于白名单绑定的群聊
+used_groups:
+  - 123456
+  - 789012
+#白名单模式,1为不允许玩家进入的模式,2为允许玩家进入参观一段时间的模式
+whitelist_mode: 1
+#白名单模式2下允许玩家参观的时间
+mode_2_allow_visit_second: 600
+#白名单模式2下参观者发言的间隔,单位为秒
+mode_2_visit_chat_cd: 10
+#检测玩家是否在群内
+check_qq_in_group: true
+#玩家退群时删除白名单
+remove_bind_when_qq_quit: false
+code_timeout_second: 300
+messages:
+  command:
+    reload: "&a已重载Whitelist4QQ"
+    remove:
+      usage: "&c用法：/whitelist4qq remove <玩家名>"
+      success: "&a已移除指定玩家的绑定！"
+  kick_message:
+    mode_1: |-
+      &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
+      &c申请方式：在群内发送“申请白名单%code%”
+      &c有效时长5分钟
+    mode_2: |-
+      &c你不在本服的白名单中并且你已经用完你的参观时间，请加入我们的QQ群123456进行白名单申请
+      &c申请方式：在群内发送“申请白名单%code%”
+      &c有效时长5分钟
+    not_in_group: "&c你不在本服的群中，无法加入服务器"
+  bot_message:
+    bind_success: "您已成功绑定玩家%player%，现在你可以游玩本服务器了！"
+    bind_failed:
+      not_exist_code: "不存在此绑定码"
+      bound: "你已经绑定了一个游戏账号%player%，无法重复绑定"
 
-  # 阻止已经绑定过 ID 的 QQ 重复绑定
-  prevent-qq-rebind: true
-
-  # 踢出信息。在踢出不在 MiraiMC 数据库的玩家时显示的踢出消息
-  # 默认提示消息使用的是 YAML 换行符，如果想使用单行消息可以设为 kick-message: "消息内容"
-  kick-message: |-
-    &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
-    &c申请方式：在群内发送“申请白名单%code%”
-    &c有效时长5分钟
-  kick-message-not-in-group: |-
-    &c你不在本服的群中，无法加入服务器
-  # 白名单模式,1为阻止进入,2为允许进入,但无法进行交互
-  whitelist_mode: 1
-  allow_visit_second: 600
-
-# 机器人配置
-bot:
-  # 用于接收验证的 QQ，只有存在于以下列表的机器人 QQ 的消息才会被处理
-  # 请至少填写一个
-  used-bot-accounts:
-    - 123456
-    - 789012
-
-  # 用于接收验证的 QQ 群，只有存在于以下列表的 QQ 群的消息才会被处理
-  # 请至少填写一个
-  used-group-numbers:
-    - 123456
-    - 789012
-
-  # 检测玩家绑定的 QQ 是否在群内，如果不在视为没有白名单
-  check-qq-in-group: true
-
-  # 有 QQ 退群时自动移除相应的绑定
-  # 建议设为 false，这样一来就算熊孩子搞完事退群也有 QQ 留着做记录
-  remove-bind-when-qq-quit: false
-
-  # 添加绑定消息前缀
-  # 玩家需要发送“消息前缀+绑定码”才会添加绑定
-  bind-command-prefix: "申请白名单"
-  select-player-command-prefix: '查询玩家绑定'
-  select-qq-command-prefix: '查询QQ绑定'
-  # 消息
-  # 插件向群内发送的所有消息都在这里配置
-  messages:
-    # 绑定成功
-    bind-success: "您已成功绑定玩家%player%，现在你可以游玩本服务器了！"
-
-    # 绑定失败
-    # 无论绑定失败的原因是什么，都只会发这一条
-    # 可用变量：%id% - QQ绑定的ID（use-self-data为true时不可用）
-    bind-failed:
-      not-exist-code: '不存在此绑定码'
-      bound: '你已经绑定了一个游戏账号%player%，无法重复绑定'
-
-    select-qq-failed-number-format: '查询错误，你查询的内容并不是一个QQ号'
-    select-qq-failed-not-exist: '查询完成，不存在此QQ绑定的玩家'
-    select-qq-success: '查询完成，此QQ绑定的玩家为%player%'
-    select-player-failed-not-exist: '查询完成，此玩家没有绑定QQ号'
-    select-player-success: '查询完成，该玩家绑定的QQ为%qq%'
+    select_qq_failed:
+      number_format: "查询错误，你查询的内容并不是一个QQ号"
+      not_exist: "查询完成，不存在此QQ绑定的玩家"
+    select_qq_success: "查询完成，此QQ绑定的玩家为%player%"
+    select_player_failed_not_exist: "查询完成，此玩家没有绑定QQ号"
+    select_player_success: "查询完成，该玩家绑定的QQ为%qq%"

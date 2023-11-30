@@ -2,15 +2,17 @@ package com.github.yufiriamazenta.whitelist4qq.listener;
 
 import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
+import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.listener.BukkitListener;
 import crypticlib.util.TextUtil;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.GameMode;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.*;
 
 import java.util.UUID;
 
@@ -24,16 +26,15 @@ public enum PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerLoginOnWhitelistMode1(AsyncPlayerPreLoginEvent event) {
-        if (Whitelist4QQ.getInstance().whitelistMode() != 1)
+        if (Whitelist4QQ.instance().whitelistMode() != 1)
             return;
         UUID uuid = event.getUniqueId();
         WhitelistManager.WhitelistState whitelistState = WhitelistManager.getWhitelistState(uuid);
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
         switch (whitelistState) {
             case HAS_WHITELIST:
                 return;
             case NOT_IN_GROUP:
-                String notInGroupMsg = config.getString("general.kick-message-not-in-group", "general.kick-message-not-in-group");
+                String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
                 break;
             case NO_WHITELIST:
@@ -45,9 +46,7 @@ public enum PlayerListener implements Listener {
                     code = code.substring(code.length() - 6);
                     WhitelistManager.addBindCodeCache(code, uuid);
                 }
-                String bindHintMsg = config.getString("general.kick-message", "%code%");
-                bindHintMsg = bindHintMsg.replace("%code%", code);
-                bindHintMsg = TextUtil.color(bindHintMsg);
+                String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, bindHintMsg);
                 break;
             default:
@@ -57,25 +56,32 @@ public enum PlayerListener implements Listener {
 
     @EventHandler
     public void playerLoginOnWhitelistMode2(PlayerLoginEvent event) {
-        if (Whitelist4QQ.getInstance().whitelistMode() != 2)
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
             return;
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
         Player player = event.getPlayer();
         WhitelistManager.WhitelistState state = WhitelistManager.getWhitelistState(player.getUniqueId());
         switch (state) {
             case NO_WHITELIST:
-                long firstPlayed = player.getFirstPlayed();
-                long playedTime = System.currentTimeMillis() - firstPlayed;
-                long allowVisitTime = config.getLong("general.allow_visit_second", 600L) * 1000;
-                if (playedTime > allowVisitTime) {
-                    String msg = config.getString("general.kick_message", "general.kick_message");
-                    event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(msg));
+                long playedTime = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+                long allowVisitTime = Configs.mode2AllowVisitSecond.value() * 20;
+                if (playedTime >= allowVisitTime) {
+                    String code;
+                    if (WhitelistManager.getReverseBindCodeMap().containsKey(player.getUniqueId())) {
+                        code = WhitelistManager.getReverseBindCodeMap().get(player.getUniqueId());
+                    } else {
+                        code = UUID.randomUUID().toString();
+                        code = code.substring(code.length() - 6);
+                        WhitelistManager.addBindCodeCache(code, player.getUniqueId());
+                    }
+                    String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
+                    event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(bindHintMsg));
                     return;
                 }
-                //TODO 添加标识
+                player.setGameMode(GameMode.ADVENTURE);
+                WhitelistManager.addVisitTag2Player(player);
                 break;
             case NOT_IN_GROUP:
-                String notInGroupMsg = config.getString("general.kick-message-not-in-group", "general.kick-message-not-in-group");
+                String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
                 event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
                 break;
             case HAS_WHITELIST:
@@ -83,6 +89,52 @@ public enum PlayerListener implements Listener {
             default:
                 event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "Error");
         }
+    }
+
+    @EventHandler
+    public void onVisitorGameModeChange(PlayerGameModeChangeEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        Player player = event.getPlayer();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        if (!event.getNewGameMode().equals(GameMode.ADVENTURE)) {
+            event.setCancelled(true);
+            player.setGameMode(GameMode.ADVENTURE);
+        }
+    }
+
+    @EventHandler
+    public void onVisitorInteract(PlayerInteractEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        Player player = event.getPlayer();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVisitorInteractEntity(PlayerInteractEntityEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        Player player = event.getPlayer();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVisitorPickUpItem(EntityPickupItemEvent event) {
+        if (Whitelist4QQ.instance().whitelistMode() != 2)
+            return;
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        if (!WhitelistManager.hasVisitTag(player))
+            return;
+        event.setCancelled(true);
     }
 
 }

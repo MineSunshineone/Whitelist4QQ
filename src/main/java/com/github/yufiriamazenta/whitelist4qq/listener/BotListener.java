@@ -1,7 +1,7 @@
 package com.github.yufiriamazenta.whitelist4qq.listener;
 
-import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
+import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.listener.BukkitListener;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
@@ -9,10 +9,10 @@ import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
 import me.dreamvoid.miraimc.bukkit.event.message.passive.MiraiGroupMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -25,76 +25,96 @@ public enum BotListener implements Listener {
 
     @EventHandler
     public void onGroupMessage(MiraiGroupMessageEvent e) {
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
-
-        if (!config.getLongList("bot.used-bot-accounts").contains(e.getBotID()))
+        //收到消息的机器人不在配置中时不触发绑定
+        if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
             return;
-        if (!config.getLongList("bot.used-group-numbers").contains(e.getGroupID()))
+        //收到消息的群不在配置中时不触发绑定
+        if (!Configs.usedGroups.value().contains(e.getGroupID()))
             return;
-        if (!e.getMessage().startsWith(config.getString("bot.bind-command-prefix")))
+        //只有前缀符合时才触发绑定
+        if (!e.getMessage().startsWith(Configs.bindCommandPrefix.value()))
             return;
-        if (MiraiMC.getBind(e.getSenderID()) != null) {
-            String boundMsg = config.getString("bot.messages.bind-failed.bound", "bot.messages.bind-failed.bound");
-            boundMsg = boundMsg.replace("%player%", Bukkit.getOfflinePlayer(MiraiMC.getBind(e.getSenderID())).getName());
-            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(boundMsg);
-            return;
+        //阻止已经绑定的QQ绑定
+        if (Configs.preventQQRebind.value()) {
+            WhitelistManager.WhitelistState whitelistState = WhitelistManager.getWhitelistState(e.getSenderID());
+            if (WhitelistManager.WhitelistState.HAS_WHITELIST.equals(whitelistState)) {
+                String playerName;
+                UUID bind = MiraiMC.getBind(e.getSenderID());
+                if (bind == null) {
+                    playerName = "null";
+                } else {
+                    OfflinePlayer boundPlayer = Bukkit.getOfflinePlayer(bind);
+                    if (boundPlayer.getName() == null) {
+                        playerName = Objects.requireNonNull(bind).toString();
+                    } else {
+                        playerName = boundPlayer.getName();
+                    }
+                }
+                String boundMsg = Configs.messagesBotMessageBindFailedBound.value().replace("%player%", playerName);
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(boundMsg);
+                return;
+            }
         }
-        String bindCode = e.getMessage().replace(config.getString("bot.bind-command-prefix"), "");
-        bindCode = bindCode.replace("\\s", "");
 
+        //去除无关字符
+        String bindCode = e.getMessage()
+            .replace(Configs.bindCommandPrefix.value(), "")
+            .replace("\\s", "");
+
+        //如果没有对应检测码则提示绑定失败
         if (!WhitelistManager.getBindCodeMap().containsKey(bindCode)) {
-            String bindFailedNotExistCode = config.getString("bot.messages.bind-failed.not-exist-code", "bot.messages.bind-failed.not-exist-code");
-            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(bindFailedNotExistCode);
+            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageBindFailedNotExistCode.value());
             return;
         }
 
+        //添加绑定
+        String playerName;
         UUID uuid = WhitelistManager.getBindCodeMap().get(bindCode);
-        MiraiMC.addBind(uuid, e.getSenderID());
-        String replyMsg = config.getString("bot.messages.bind-success");
-        replyMsg = replyMsg.replace("%player%", Bukkit.getOfflinePlayer(uuid).getName());
+        OfflinePlayer bindPlayer = Bukkit.getOfflinePlayer(uuid);
+        if (bindPlayer.getName() == null) {
+            playerName = uuid.toString();
+        } else {
+            playerName = bindPlayer.getName();
+        }
+        String replyMsg = Configs.messagesBotMessageBindSuccess.value().replace("%player%", playerName);
         MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(replyMsg);
-        WhitelistManager.removeBindCodeCache(bindCode);
+        WhitelistManager.addBind(e.getSenderID(), bindCode);
     }
 
     @EventHandler
     public void onSelectPlayer(MiraiGroupMessageEvent e) {
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
-        if (!config.getLongList("bot.used-bot-accounts").contains(e.getBotID()))
+        if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
             return;
-        if (!config.getLongList("bot.used-group-numbers").contains(e.getGroupID()))
+        if (!Configs.usedGroups.value().contains(e.getGroupID()))
             return;
-        if (!e.getMessage().startsWith(config.getString("bot.select-player-command-prefix")) && !e.getMessage().startsWith(config.getString("bot.select-qq-command-prefix")))
+        if (!e.getMessage().startsWith(Configs.selectPlayerCommandPrefix.value()) && !e.getMessage().startsWith(Configs.selectQQCommandPrefix.value()))
             return;
-        if (e.getMessage().startsWith(config.getString("bot.select-qq-command-prefix"))) {
-            String qqStr = e.getMessage().replace(config.getString("bot.select-qq-command-prefix"), "");
-            qqStr = qqStr.replaceAll("\\s", "");
+        if (e.getMessage().startsWith(Configs.selectQQCommandPrefix.value())) {
+            String qqStr = e.getMessage()
+                .replace(Configs.selectQQCommandPrefix.value(), "")
+                .replace("\\s", "");
             try {
                 long qq = Long.parseLong(qqStr);
                 UUID bind = MiraiMC.getBind(qq);
                 if (bind == null) {
-                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(config.getString("bot.messages.select-qq-failed-not-exist"));
+                    MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectQQFailedNotExist.value());
                 } else {
-                    String msg = config.getString("bot.messages.select-qq-success");
-                    msg = msg.replace("%player%", Bukkit.getOfflinePlayer(bind).getName());
+                    String msg = Configs.messagesBotMessageSelectQQSuccess.value().replace("%player%", Bukkit.getOfflinePlayer(bind).getName());
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
                 }
             } catch (NumberFormatException exc) {
-                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(config.getString("bot.messages.select-qq-failed-number-format"));
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectQQFailedNumberFormat.value());
             }
         } else {
-            String player = e.getMessage().replace(config.getString("bot.select-player-command-prefix"), "");
-            player = player.replaceAll("\\s", "");
+            String player = e.getMessage()
+                .replace(Configs.selectPlayerCommandPrefix.value(), "")
+                .replace("\\s", "");
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-            if (offlinePlayer == null) {
-                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(config.getString("bot.messages.select-player-failed-not-exist"));
-                return;
-            }
             long bind = MiraiMC.getBind(offlinePlayer.getUniqueId());
             if (bind == 0L) {
-                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(config.getString("bot.messages.select-player-failed-not-exist"));
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectPlayerFailedNotExist.value());
             } else {
-                String msg = config.getString("bot.messages.select-player-success");
-                msg = msg.replace("%qq%", bind + "");
+                String msg = Configs.messagesBotMessageSelectPlayerSuccess.value().replace("%qq%", bind + "");
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
             }
         }
@@ -102,10 +122,9 @@ public enum BotListener implements Listener {
 
     @EventHandler
     public void onGroupQuit(MiraiMemberLeaveEvent e) {
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.getInstance().getConfig();
-        if (!config.getBoolean("bot.remove-bind-when-qq-quit"))
+        if (!Configs.remove_bind_when_qq_quit.value())
             return;
-        if (config.getLongList("bot.used-bot-accounts").contains(e.getBotID()) && config.getLongList("bot.used-group-accounts").contains(e.getGroupID())) {
+        if (Configs.usedBotAccounts.value().contains(e.getBotID()) && Configs.usedGroups.value().contains(e.getGroupID())) {
             MiraiMC.removeBind(e.getTargetID());
         }
     }
