@@ -24,11 +24,11 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
-    implementation("com.crypticlib:common:0.3.7")
+    implementation("com.crypticlib:common:0.4.1")
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.6"
+version = "1.6.1"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
 java.sourceCompatibility = JavaVersion.VERSION_1_8

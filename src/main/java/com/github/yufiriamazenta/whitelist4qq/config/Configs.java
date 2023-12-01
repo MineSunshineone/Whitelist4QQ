@@ -1,13 +1,15 @@
 package com.github.yufiriamazenta.whitelist4qq.config;
 
-import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
-import com.github.yufiriamazenta.whitelist4qq.config.entry.*;
-import org.bukkit.configuration.file.YamlConfiguration;
+import crypticlib.config.YamlConfigHandler;
+import crypticlib.config.entry.BooleanConfigEntry;
+import crypticlib.config.entry.IntConfigEntry;
+import crypticlib.config.entry.LongListConfigEntry;
+import crypticlib.config.entry.StringConfigEntry;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@YamlConfigHandler(path = "config.yml")
 public class Configs {
 
     public static final StringConfigEntry messagesKickMessageMode1 = new StringConfigEntry("messages.kick_message.mode_1",
@@ -48,21 +50,5 @@ public class Configs {
     public static final StringConfigEntry messagesMode2BindHintMessage = new StringConfigEntry("messages.mode_2_bind_hint_message", "&a如果您觉得我们服务器不错,可以使用命令/bind申请白名单噢");
     public static final IntConfigEntry mode2VisitorChatCd = new IntConfigEntry("mode_2_visitor_chat_cd", 10);
     public static final StringConfigEntry messagesVisitorChatInCd = new StringConfigEntry("messages.visitor_chat_in_cd", "&c您当前只能每10秒发送一条消息");
-
-    public static void reload() {
-        Whitelist4QQ.instance().reloadConfig();
-        YamlConfiguration config = (YamlConfiguration) Whitelist4QQ.instance().getConfig();
-        try {
-            for (Field field : Configs.class.getFields()) {
-                Object object = field.get(null);
-                if (object instanceof ConfigEntry<?>) {
-                    ((ConfigEntry<?>) object).load(config);
-                }
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        Whitelist4QQ.instance().saveConfig();
-    }
 
 }
