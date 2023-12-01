@@ -1,10 +1,10 @@
 package com.github.yufiriamazenta.whitelist4qq.config;
 
-import crypticlib.config.YamlConfigHandler;
-import crypticlib.config.entry.BooleanConfigEntry;
-import crypticlib.config.entry.IntConfigEntry;
-import crypticlib.config.entry.LongListConfigEntry;
-import crypticlib.config.entry.StringConfigEntry;
+import crypticlib.config.yaml.YamlConfigHandler;
+import crypticlib.config.yaml.entry.BooleanConfigEntry;
+import crypticlib.config.yaml.entry.IntConfigEntry;
+import crypticlib.config.yaml.entry.LongListConfigEntry;
+import crypticlib.config.yaml.entry.StringConfigEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;

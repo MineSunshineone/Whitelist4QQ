@@ -24,7 +24,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
-    implementation("com.crypticlib:common:0.4.1")
+    implementation("com.crypticlib:common:0.4.3")
 }
 
 group = "com.github.yufiriamazenta"
