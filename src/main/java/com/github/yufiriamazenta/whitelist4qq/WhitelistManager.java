@@ -66,7 +66,7 @@ public class WhitelistManager {
             CrypticLib.platform().scheduler().runTask(Whitelist4QQ.instance(), () -> {
                 Player player = Bukkit.getPlayer(bindUuid);
                 if (player != null)
-                    removeVisitTag2Player(player);
+                    removeVisitTag4Player(player);
             });
         }
     }
@@ -84,7 +84,7 @@ public class WhitelistManager {
         dataContainer.set(WhitelistManager.PLAYER_VISIT_TAG_KEY, PersistentDataType.BYTE, (byte) 1);
     }
 
-    public static void removeVisitTag2Player(Player player) {
+    public static void removeVisitTag4Player(Player player) {
         PersistentDataContainer dataContainer = player.getPersistentDataContainer();
         if (!hasVisitTag(player)) {
             return;

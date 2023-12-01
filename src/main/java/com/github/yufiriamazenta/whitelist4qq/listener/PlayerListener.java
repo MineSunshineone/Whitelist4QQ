@@ -89,6 +89,7 @@ public enum PlayerListener implements Listener {
                 event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
                 break;
             case HAS_WHITELIST:
+                WhitelistManager.removeVisitTag4Player(player);
                 return;
             default:
                 event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "Error");

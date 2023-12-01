@@ -28,7 +28,7 @@ dependencies {
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.6.1"
+version = "1.6.2"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
 java.sourceCompatibility = JavaVersion.VERSION_1_8
