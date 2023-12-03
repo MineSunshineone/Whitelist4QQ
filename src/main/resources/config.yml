@@ -28,6 +28,8 @@ check_qq_in_group: true
 remove_bind_when_qq_quit: false
 code_timeout_second: 300
 messages:
+  placeholder:
+    visitor_tag: "&a[参观玩家]"
   command:
     player_only: "&a此命令只允许玩家使用"
     reload: "&a已重载Whitelist4QQ"
@@ -37,6 +39,7 @@ messages:
     bind:
       bound: "&a您已经绑定过，无需再次绑定"
       wait: "&a您的绑定码为%code%，请在群内使用“申请白名单%code%”进行申请"
+      bind: "&a您已绑定%qq%，现在你可以游玩本服务器了！"
   kick_message:
     mode_1: |-
       &c你不在本服的白名单中，请加入我们的QQ群123456进行申请

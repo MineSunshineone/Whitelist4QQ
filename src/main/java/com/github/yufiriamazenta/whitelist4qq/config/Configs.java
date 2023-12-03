@@ -51,4 +51,8 @@ public class Configs {
     public static final IntConfigEntry mode2VisitorChatCd = new IntConfigEntry("mode_2_visitor_chat_cd", 10);
     public static final StringConfigEntry messagesVisitorChatInCd = new StringConfigEntry("messages.visitor_chat_in_cd", "&c您当前只能每10秒发送一条消息");
 
+    public static final StringConfigEntry messagesCommandBindBind = new StringConfigEntry("messages.command.bind.bind", "&a您已绑定%qq%，现在你可以游玩本服务器了！");
+
+    public static final StringConfigEntry messagesPlaceholderVisitorTag = new StringConfigEntry("messages.placeholder.visitor_tag", "&a[参观玩家]");
+
 }

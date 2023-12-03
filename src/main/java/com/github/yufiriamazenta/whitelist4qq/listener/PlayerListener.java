@@ -1,13 +1,14 @@
 package com.github.yufiriamazenta.whitelist4qq.listener;
 
-import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.listener.BukkitListener;
 import crypticlib.util.MsgUtil;
 import crypticlib.util.TextUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,11 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum PlayerListener implements Listener {
 
     INSTANCE;
-    private Map<UUID, Long> visitorChatTimeMap = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> visitorChatTimeMap = new ConcurrentHashMap<>();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerLoginOnWhitelistMode1(AsyncPlayerPreLoginEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 1)
+        if (Configs.whitelistMode.value() != 1)
             return;
         UUID uuid = event.getUniqueId();
         WhitelistManager.WhitelistState whitelistState = WhitelistManager.getWhitelistState(uuid);
@@ -60,48 +61,47 @@ public enum PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void playerLoginOnWhitelistMode2(PlayerLoginEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+    public void playerLoginOnWhitelistMode2(AsyncPlayerPreLoginEvent event) {
+        if (Configs.whitelistMode.value() != 2)
             return;
-        Player player = event.getPlayer();
-        WhitelistManager.WhitelistState state = WhitelistManager.getWhitelistState(player.getUniqueId());
+        UUID uuid = event.getUniqueId();
+        WhitelistManager.WhitelistState state = WhitelistManager.getWhitelistState(uuid);
         switch (state) {
             case NO_WHITELIST:
-                long playedTime = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+                long playedTime = Bukkit.getOfflinePlayer(uuid).getStatistic(Statistic.PLAY_ONE_MINUTE);
                 long allowVisitTime = Configs.mode2AllowVisitSecond.value() * 20;
                 if (playedTime >= allowVisitTime) {
                     String code;
-                    if (WhitelistManager.getReverseBindCodeMap().containsKey(player.getUniqueId())) {
-                        code = WhitelistManager.getReverseBindCodeMap().get(player.getUniqueId());
+                    if (WhitelistManager.getReverseBindCodeMap().containsKey(uuid)) {
+                        code = WhitelistManager.getReverseBindCodeMap().get(uuid);
                     } else {
                         code = UUID.randomUUID().toString();
                         code = code.substring(code.length() - 6);
-                        WhitelistManager.addBindCodeCache(code, player.getUniqueId());
+                        WhitelistManager.addBindCodeCache(code, uuid);
                     }
                     String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
-                    event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(bindHintMsg));
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(bindHintMsg));
                     return;
                 }
-                WhitelistManager.addVisitTag2Player(player);
+                WhitelistManager.addToVisitors(uuid);
                 break;
             case NOT_IN_GROUP:
                 String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
-                event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
                 break;
             case HAS_WHITELIST:
-                WhitelistManager.removeVisitTag4Player(player);
                 return;
             default:
-                event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "Error");
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, "Error");
         }
     }
 
     @EventHandler
     public void onVisitorGameModeChange(PlayerGameModeChangeEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         Player player = event.getPlayer();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         if (!event.getNewGameMode().equals(GameMode.ADVENTURE)) {
             event.setCancelled(true);
@@ -111,56 +111,57 @@ public enum PlayerListener implements Listener {
 
     @EventHandler
     public void onVisitorInteract(PlayerInteractEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         Player player = event.getPlayer();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         event.setCancelled(true);
     }
 
     @EventHandler
     public void onVisitorInteractEntity(PlayerInteractEntityEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         Player player = event.getPlayer();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         event.setCancelled(true);
     }
 
     @EventHandler
     public void onVisitorPickUpItem(EntityPickupItemEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
         Player player = (Player) event.getEntity();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         event.setCancelled(true);
     }
 
     @EventHandler
     public void onVisitorDamageEntity(EntityDamageByEntityEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
-        if (!(event.getDamager() instanceof Player)) {
+        if (!(event.getDamager() instanceof Player) && !(event.getEntity() instanceof Player)) {
             return;
         }
-        Player player = (Player) event.getDamager();
-        if (!WhitelistManager.hasVisitTag(player))
+        Entity damager = event.getDamager();
+        Entity player = event.getEntity();
+        if (!WhitelistManager.isVisitor(damager.getUniqueId()) && !WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         event.setCancelled(true);
     }
 
     @EventHandler
     public void onVisitorChat(AsyncPlayerChatEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         Player player = event.getPlayer();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         if (visitorChatTimeMap.containsKey(player.getUniqueId())) {
             long time = System.currentTimeMillis();
@@ -179,15 +180,22 @@ public enum PlayerListener implements Listener {
 
     @EventHandler
     public void onVisitorQuit(PlayerQuitEvent event) {
-        if (Whitelist4QQ.instance().whitelistMode() != 2)
+        if (Configs.whitelistMode.value() != 2)
             return;
         Player player = event.getPlayer();
-        if (!WhitelistManager.hasVisitTag(player))
+        if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
+        WhitelistManager.removeFromVisitors(player.getUniqueId());
         visitorChatTimeMap.remove(player.getUniqueId());
     }
 
-    public Map<UUID, Long> getVisitorChatTimeMap() {
+    @EventHandler
+    public void correctionGameMode(PlayerJoinEvent event) {
+        if (!WhitelistManager.isVisitor(event.getPlayer().getUniqueId()))
+            event.getPlayer().setGameMode(event.getPlayer().getServer().getDefaultGameMode());
+    }
+
+    public Map<UUID, Long> getVisitorChatTimestampMap() {
         return visitorChatTimeMap;
     }
 

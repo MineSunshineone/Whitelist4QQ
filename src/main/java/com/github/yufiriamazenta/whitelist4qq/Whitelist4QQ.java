@@ -1,6 +1,7 @@
 package com.github.yufiriamazenta.whitelist4qq;
 
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+import com.github.yufiriamazenta.whitelist4qq.papi.Whitelist4QQExpansion;
 import crypticlib.BukkitPlugin;
 import crypticlib.CrypticLib;
 import crypticlib.command.CommandInfo;
@@ -14,13 +15,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import static crypticlib.command.CommandManager.subcommand;
 
 public class Whitelist4QQ extends BukkitPlugin {
     private static Whitelist4QQ INSTANCE;
-    private int whitelistMode;
     private int taskRunSecond = 0;
 
     public Whitelist4QQ() {
@@ -33,41 +35,44 @@ public class Whitelist4QQ extends BukkitPlugin {
 
     @Override
     public void enable() {
-        this.whitelistMode = Configs.whitelistMode.value();
         CrypticLib.platform().scheduler().runTaskTimer(this, () -> {
-            if (whitelistMode != 2)
+            if (Configs.whitelistMode.value() != 2)
                 return;
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!WhitelistManager.hasVisitTag(player))
+            Set<UUID> tmpUuids = new HashSet<>();
+            for (UUID uuid : WhitelistManager.visitors()) {
+                Player visitor = Bukkit.getPlayer(uuid);
+                if (visitor == null || !visitor.isOnline()) {
+                    tmpUuids.add(uuid);
                     continue;
-                player.setGameMode(GameMode.ADVENTURE);
-                long playedTime = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+                }
+                visitor.setGameMode(GameMode.ADVENTURE);
+                long playedTime = visitor.getStatistic(Statistic.PLAY_ONE_MINUTE);
                 long allowVisitTime = Configs.mode2AllowVisitSecond.value() * 20;
                 if (taskRunSecond >= Configs.mode2HintCd.value()) {
-                    MsgUtil.sendMsg(player, Configs.messagesMode2BindHintMessage.value());
+                    MsgUtil.sendMsg(visitor, Configs.messagesMode2BindHintMessage.value());
                     taskRunSecond = 0;
                 }
 
                 if (playedTime >= allowVisitTime) {
                     String code;
-                    if (WhitelistManager.getReverseBindCodeMap().containsKey(player.getUniqueId())) {
-                        code = WhitelistManager.getReverseBindCodeMap().get(player.getUniqueId());
+                    if (WhitelistManager.getReverseBindCodeMap().containsKey(visitor.getUniqueId())) {
+                        code = WhitelistManager.getReverseBindCodeMap().get(visitor.getUniqueId());
                     } else {
                         code = UUID.randomUUID().toString();
                         code = code.substring(code.length() - 6);
-                        WhitelistManager.addBindCodeCache(code, player.getUniqueId());
+                        WhitelistManager.addBindCodeCache(code, visitor.getUniqueId());
                     }
                     String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
-                    player.kickPlayer(bindHintMsg);
+                    visitor.kickPlayer(bindHintMsg);
                 }
             }
+            WhitelistManager.visitors().removeAll(tmpUuids);
             taskRunSecond++;
         }, 1, 20);
         new RootCmdExecutor()
             .regSub(subcommand("reload")
                 .setExecutor((sender, args) -> {
                     reloadConfig();
-                    this.whitelistMode = Configs.whitelistMode.value();
                     MsgUtil.sendMsg(sender, Configs.messagesCommandReload.value());
                     return true;
                 })
@@ -98,10 +103,10 @@ public class Whitelist4QQ extends BukkitPlugin {
                     MsgUtil.sendMsg(sender, Configs.messagesCommandPlayerOnly.value());
                     return true;
                 }
-                if (whitelistMode != 2)
+                if (Configs.whitelistMode.value() != 2)
                     return true;
                 Player player = (Player) sender;
-                if (!WhitelistManager.hasVisitTag(player)) {
+                if (!WhitelistManager.isVisitor(player.getUniqueId())) {
                     MsgUtil.sendMsg(player, Configs.messagesCommandBindBound.value());
                     return true;
                 }
@@ -126,14 +131,13 @@ public class Whitelist4QQ extends BukkitPlugin {
             null,
             new String[]{"bd"})
             );
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceHolderAPI")) {
+            new Whitelist4QQExpansion().register();
+        }
     }
 
     @Override
     public void disable() {
-    }
-
-    public int whitelistMode() {
-        return whitelistMode;
     }
 
 }

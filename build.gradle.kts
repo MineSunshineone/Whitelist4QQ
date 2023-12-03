@@ -17,18 +17,20 @@ repositories {
     maven("https://repo.maven.apache.org/maven2/")
     maven("https://repo.md-5.net/content/groups/public/")
     maven( "https://repo.dmulloy2.net/repository/public/" )
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     mavenCentral()
 }
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly("org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.1")
+    compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
     implementation("com.crypticlib:common:0.4.3")
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.6.2"
+version = "1.6.3"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
 java.sourceCompatibility = JavaVersion.VERSION_1_8

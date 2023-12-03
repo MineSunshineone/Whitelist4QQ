@@ -3,6 +3,7 @@ package com.github.yufiriamazenta.whitelist4qq.listener;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import crypticlib.listener.BukkitListener;
+import crypticlib.util.MsgUtil;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
@@ -77,7 +78,11 @@ public enum BotListener implements Listener {
             playerName = bindPlayer.getName();
         }
         String replyMsg = Configs.messagesBotMessageBindSuccess.value().replace("%player%", playerName);
-        MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(replyMsg);
+        if (bindPlayer.isOnline()) {
+            MsgUtil.sendMsg(Bukkit.getPlayer(uuid), Configs.messagesCommandBindBind.value().replace("%qq%", e.getSenderID() + ""));
+        } else {
+            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(replyMsg);
+        }
         WhitelistManager.addBind(e.getSenderID(), bindCode);
     }
 

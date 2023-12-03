@@ -6,24 +6,17 @@ import crypticlib.CrypticLib;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.api.bot.MiraiGroup;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WhitelistManager {
 
     private static final Map<String, UUID> bindCodeMap = new ConcurrentHashMap<>();
     private static final Map<String, Long> bindCodeTimeStampMap = new ConcurrentHashMap<>();
     private static final Map<UUID, String> reverseBindCodeMap = new ConcurrentHashMap<>();
-    public static final NamespacedKey PLAYER_VISIT_TAG_KEY = new NamespacedKey(Whitelist4QQ.instance(), "visit");
+    private static final List<UUID> visitors = new CopyOnWriteArrayList<>();
 
     static {
         CrypticLib.platform().scheduler().runTaskTimer(Whitelist4QQ.instance(), () -> {
@@ -61,36 +54,20 @@ public class WhitelistManager {
         UUID bindUuid = bindCodeMap.get(bindCode);
         MiraiMC.addBind(bindUuid, bindQQ);
         removeBindCodeCache(bindCode);
-        PlayerListener.INSTANCE.getVisitorChatTimeMap().remove(bindUuid);
-        if (Whitelist4QQ.instance().whitelistMode() == 2) {
-            CrypticLib.platform().scheduler().runTask(Whitelist4QQ.instance(), () -> {
-                Player player = Bukkit.getPlayer(bindUuid);
-                if (player != null)
-                    removeVisitTag4Player(player);
-            });
-        }
+        PlayerListener.INSTANCE.getVisitorChatTimestampMap().remove(bindUuid);
+        visitors.remove(bindUuid);
     }
 
-    public static boolean hasVisitTag(Player player) {
-        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
-        return dataContainer.has(WhitelistManager.PLAYER_VISIT_TAG_KEY, PersistentDataType.BYTE);
+    public static boolean isVisitor(UUID uuid) {
+        return visitors.contains(uuid);
     }
 
-    public static void addVisitTag2Player(Player player) {
-        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
-        if (hasVisitTag(player)) {
-            return;
-        }
-        dataContainer.set(WhitelistManager.PLAYER_VISIT_TAG_KEY, PersistentDataType.BYTE, (byte) 1);
+    public static void addToVisitors(UUID uuid){
+        visitors.add(uuid);
     }
 
-    public static void removeVisitTag4Player(Player player) {
-        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
-        if (!hasVisitTag(player)) {
-            return;
-        }
-        dataContainer.remove(WhitelistManager.PLAYER_VISIT_TAG_KEY);
-        player.setGameMode(GameMode.SURVIVAL);
+    public static void removeFromVisitors(UUID uuid) {
+        visitors.remove(uuid);
     }
 
     /**
@@ -139,6 +116,10 @@ public class WhitelistManager {
             }
         }
         return WhitelistState.NOT_IN_GROUP;
+    }
+
+    public static List<UUID> visitors() {
+        return visitors;
     }
 
     public enum WhitelistState {
