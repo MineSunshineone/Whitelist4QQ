@@ -15,9 +15,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static crypticlib.command.CommandManager.subcommand;
 
@@ -88,6 +86,59 @@ public class Whitelist4QQ extends BukkitPlugin {
                     MsgUtil.sendMsg(sender, Configs.messagesCommandRemoveSuccess.value());
                     return true;
                 }).setPermission("whitelist4qq.command.remove"))
+            .regSub(subcommand("getbind")
+                .setExecutor((sender, args) -> {
+                    if (args.isEmpty()) {
+                        MsgUtil.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
+                        return true;
+                    }
+                    try {
+                        long qq = Long.parseLong(args.get(0));
+                        MsgUtil.sendMsg(sender, Configs.messagesCommandGetBindSelecting.value());
+                        CrypticLib.platform().scheduler().runTaskAsync(this, () -> {
+                            UUID bind = MiraiMC.getBind(qq);
+                            if (bind == null) {
+                                MsgUtil.sendMsg(sender, Configs.messagesCommandGetBindNotExist.value());
+                                return;
+                            }
+                            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(bind);
+                            String name;
+                            if (offlinePlayer.getName() == null) {
+                                name = bind.toString();
+                            } else {
+                                name = offlinePlayer.getName();
+                            }
+                            MsgUtil.sendMsg(sender, Configs.messagesCommandGetBindSuccess.value(), Map.of("%qq%", args.get(0), "%player%", name));
+                        });
+                        return true;
+                    } catch (NumberFormatException e) {
+                        MsgUtil.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
+                        return true;
+                    }
+                })
+                .setPermission("whitelist4qq.command.getbind"))
+            .regSub(subcommand("getqq")
+                .setExecutor((sender, args) -> {
+                    if (args.isEmpty()) {
+                        MsgUtil.sendMsg(sender, Configs.messagesCommandGetQQInvalidPlayer.value());
+                        return true;
+                    }
+                    MsgUtil.sendMsg(sender, Configs.messagesCommandGetQQSelecting.value());
+                    CrypticLib.platform().scheduler().runTaskAsync(this, () -> {
+                        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args.get(0));
+                        UUID uuid = offlinePlayer.getUniqueId();
+                        long bind = MiraiMC.getBind(uuid);
+                        if (bind == 0) {
+                            MsgUtil.sendMsg(sender, Configs.messagesCommandGetQQNotExist.value());
+                            return;
+                        }
+
+                        MsgUtil.sendMsg(sender, Configs.messagesCommandGetQQSuccess.value(), Map.of("%qq%", bind + "", "%player%", args.get(0)));
+                    });
+
+                    return true;
+                })
+                .setPermission("whitelist4qq.command.getqq"))
             .setExecutor((sender, args) -> {
                 MsgUtil.sendMsg(sender, "This server is running " + getDescription().getName() + " version " + getDescription().getVersion() + " by " + getDescription().getAuthors().toString().replace("[", "").replace("]", "") + " (MiraiMC version " + Bukkit.getPluginManager().getPlugin("MiraiMC").getDescription().getVersion() + ")");
                 return true;

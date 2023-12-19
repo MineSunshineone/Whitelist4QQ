@@ -30,11 +30,11 @@ dependencies {
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.6.3"
+version = "1.7.0"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 publishing {
     publications.create<MavenPublication>("maven") {

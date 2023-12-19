@@ -54,5 +54,13 @@ public class Configs {
     public static final StringConfigEntry messagesCommandBindBind = new StringConfigEntry("messages.command.bind.bind", "&a您已绑定%qq%，现在你可以游玩本服务器了！");
 
     public static final StringConfigEntry messagesPlaceholderVisitorTag = new StringConfigEntry("messages.placeholder.visitor_tag", "&a[参观玩家]");
+    public static final StringConfigEntry messagesCommandGetBindInvalidQQ = new StringConfigEntry("messages.command.get_bind.invalid_qq", "&c请输入有效的qq号");
+    public static final StringConfigEntry messagesCommandGetBindSelecting = new StringConfigEntry("messages.command.get_bind.selecting", "&a&l正在查找绑定中");
+    public static final StringConfigEntry messagesCommandGetBindNotExist = new StringConfigEntry("messages.command.get_bind.not_exist", "&a查询完成，此QQ没有绑定玩家");
+    public static final StringConfigEntry messagesCommandGetBindSuccess = new StringConfigEntry("messages.command.get_bind.success", "&a查询完成，%qq%绑定的玩家为%player%");
+    public static final StringConfigEntry messagesCommandGetQQInvalidPlayer = new StringConfigEntry("messages.command.get_qq.invalid_player", "&c此玩家未在服务器注册过");
+    public static final StringConfigEntry messagesCommandGetQQSelecting = new StringConfigEntry("messages.command.get_qq.selecting", "&a&l正在查找绑定中");
+    public static final StringConfigEntry messagesCommandGetQQNotExist = new StringConfigEntry("messages.command.get_qq.not_exist", "&a查询完成，此玩家没有绑定QQ");
+    public static final StringConfigEntry messagesCommandGetQQSuccess = new StringConfigEntry("messages.command.get_qq.success", "&a查询完成，%player%绑定的QQ为%qq%");
 
 }
