@@ -2,9 +2,9 @@ package com.github.yufiriamazenta.whitelist4qq.listener;
 
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+import crypticlib.chat.MessageSender;
+import crypticlib.chat.TextProcessor;
 import crypticlib.listener.BukkitListener;
-import crypticlib.util.MsgUtil;
-import crypticlib.util.TextUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
@@ -41,7 +41,7 @@ public enum PlayerListener implements Listener {
                 return;
             case NOT_IN_GROUP:
                 String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(notInGroupMsg));
                 break;
             case NO_WHITELIST:
                 String code;
@@ -52,7 +52,7 @@ public enum PlayerListener implements Listener {
                     code = code.substring(code.length() - 6);
                     WhitelistManager.addBindCodeCache(code, uuid);
                 }
-                String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
+                String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, bindHintMsg);
                 break;
             default:
@@ -79,15 +79,15 @@ public enum PlayerListener implements Listener {
                         code = code.substring(code.length() - 6);
                         WhitelistManager.addBindCodeCache(code, uuid);
                     }
-                    String bindHintMsg = TextUtil.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(bindHintMsg));
+                    String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(bindHintMsg));
                     return;
                 }
                 WhitelistManager.addToVisitors(uuid);
                 break;
             case NOT_IN_GROUP:
                 String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextUtil.color(notInGroupMsg));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(notInGroupMsg));
                 break;
             case HAS_WHITELIST:
                 return;
@@ -133,10 +133,9 @@ public enum PlayerListener implements Listener {
     public void onVisitorPickUpItem(EntityPickupItemEvent event) {
         if (Configs.whitelistMode.value() != 2)
             return;
-        if (!(event.getEntity() instanceof Player)) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
-        Player player = (Player) event.getEntity();
         if (!WhitelistManager.isVisitor(player.getUniqueId()))
             return;
         event.setCancelled(true);
@@ -168,7 +167,7 @@ public enum PlayerListener implements Listener {
             long lastChatTime = visitorChatTimeMap.get(player.getUniqueId());
             int chatCd = Configs.mode2VisitorChatCd.value() * 1000;
             if (time - lastChatTime < chatCd) {
-                MsgUtil.sendMsg(player, Configs.messagesVisitorChatInCd.value());
+                MessageSender.sendMsg(player, Configs.messagesVisitorChatInCd.value());
                 event.setCancelled(true);
                 return;
             }

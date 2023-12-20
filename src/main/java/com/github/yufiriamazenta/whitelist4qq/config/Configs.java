@@ -1,25 +1,27 @@
 package com.github.yufiriamazenta.whitelist4qq.config;
 
-import crypticlib.config.yaml.YamlConfigHandler;
-import crypticlib.config.yaml.entry.BooleanConfigEntry;
-import crypticlib.config.yaml.entry.IntConfigEntry;
-import crypticlib.config.yaml.entry.LongListConfigEntry;
-import crypticlib.config.yaml.entry.StringConfigEntry;
+import crypticlib.config.ConfigHandler;
+import crypticlib.config.entry.BooleanConfigEntry;
+import crypticlib.config.entry.IntConfigEntry;
+import crypticlib.config.entry.LongListConfigEntry;
+import crypticlib.config.entry.StringConfigEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@YamlConfigHandler(path = "config.yml")
+@ConfigHandler(path = "config.yml")
 public class Configs {
 
     public static final StringConfigEntry messagesKickMessageMode1 = new StringConfigEntry("messages.kick_message.mode_1",
-        "&c你不在本服的白名单中，请加入我们的QQ群123456进行申请\n" +
-            "&c申请方式：在群内发送“申请白名单%code%”\n" +
-            "&c有效时长5分钟");
+        """
+            &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
+            &c申请方式：在群内发送“申请白名单%code%”
+            &c有效时长5分钟""");
     public static final StringConfigEntry messagesKickMessageMode2 = new StringConfigEntry("messages.kick_message.mode_2",
-        "&c你不在本服的白名单中，请加入我们的QQ群123456进行申请\n" +
-            "&c申请方式：在群内发送“申请白名单%code%”\n" +
-            "&c有效时长5分钟");
+        """
+            &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
+            &c申请方式：在群内发送“申请白名单%code%”
+            &c有效时长5分钟""");
     public static final StringConfigEntry messagesKickMessageNotInGroup = new StringConfigEntry("messages.kick_message.not_in_group", "&c你不在本服的群中，无法加入服务器");
     public static final StringConfigEntry messagesBotMessageBindSuccess = new StringConfigEntry("messages.bot_message.bind_success", "您已成功绑定玩家%player%，现在你可以游玩本服务器了！");
     public static final StringConfigEntry messagesBotMessageBindFailedNotExistCode = new StringConfigEntry("messages.bot_message.bind_failed.not_exist_code", "不存在此绑定码");
@@ -58,9 +60,12 @@ public class Configs {
     public static final StringConfigEntry messagesCommandGetBindSelecting = new StringConfigEntry("messages.command.get_bind.selecting", "&a&l正在查找绑定中");
     public static final StringConfigEntry messagesCommandGetBindNotExist = new StringConfigEntry("messages.command.get_bind.not_exist", "&a查询完成，此QQ没有绑定玩家");
     public static final StringConfigEntry messagesCommandGetBindSuccess = new StringConfigEntry("messages.command.get_bind.success", "&a查询完成，%qq%绑定的玩家为%player%");
+    public static final StringConfigEntry messagesCommandGetBindHover = new StringConfigEntry("messages.command.get_bind.hover", "&a点击复制名字");
+
     public static final StringConfigEntry messagesCommandGetQQInvalidPlayer = new StringConfigEntry("messages.command.get_qq.invalid_player", "&c此玩家未在服务器注册过");
     public static final StringConfigEntry messagesCommandGetQQSelecting = new StringConfigEntry("messages.command.get_qq.selecting", "&a&l正在查找绑定中");
     public static final StringConfigEntry messagesCommandGetQQNotExist = new StringConfigEntry("messages.command.get_qq.not_exist", "&a查询完成，此玩家没有绑定QQ");
     public static final StringConfigEntry messagesCommandGetQQSuccess = new StringConfigEntry("messages.command.get_qq.success", "&a查询完成，%player%绑定的QQ为%qq%");
+    public static final StringConfigEntry messagesCommandGetQQHover = new StringConfigEntry("messages.command.get_qq.hover", "&a点击复制QQ");
 
 }
