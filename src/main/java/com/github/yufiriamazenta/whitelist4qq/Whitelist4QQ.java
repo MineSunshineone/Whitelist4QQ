@@ -179,7 +179,8 @@ public class Whitelist4QQ extends BukkitPlugin {
 
                     return true;
                 })
-                .setPermission("whitelist4qq.command.getqq"))
+                .setPermission("whitelist4qq.command.getqq")
+                .setTabArgsSupplier(() -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList())))
             .setExecutor((sender, args) -> {
                 MessageSender.sendMsg(sender, "This server is running " + getDescription().getName() + " version " + getDescription().getVersion() + " by " + getDescription().getAuthors().toString().replace("[", "").replace("]", "") + " (MiraiMC version " + Bukkit.getPluginManager().getPlugin("MiraiMC").getDescription().getVersion() + ")");
                 return true;
