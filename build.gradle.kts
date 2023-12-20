@@ -26,11 +26,11 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.1")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
-    implementation("com.crypticlib:common:0.9.7")
+    implementation("com.crypticlib:common:0.9.8")
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.7.1-dev1"
+version = "1.7.1-dev2"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
 java.sourceCompatibility = JavaVersion.VERSION_17
