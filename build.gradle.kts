@@ -30,7 +30,7 @@ dependencies {
 }
 
 group = "com.github.yufiriamazenta"
-version = "1.7.1-dev3"
+version = "1.7.1"
 var mainClass = "${rootProject.group}.${rootProject.name.lowercase()}.Whitelist4QQ"
 var pluginVersion: String = version.toString() + "-" + SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
 java.sourceCompatibility = JavaVersion.VERSION_17
