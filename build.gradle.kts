@@ -26,7 +26,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.1")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
-    implementation("com.crypticlib:common:0.9.10")
+    implementation("com.crypticlib:common:0.10.0")
 }
 
 group = "com.github.yufiriamazenta"
