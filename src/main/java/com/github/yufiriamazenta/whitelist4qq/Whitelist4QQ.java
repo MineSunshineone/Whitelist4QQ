@@ -16,10 +16,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static crypticlib.command.CommandManager.subcommand;
@@ -180,7 +181,7 @@ public class Whitelist4QQ extends BukkitPlugin {
                     return true;
                 })
                 .setPermission("whitelist4qq.command.getqq")
-                .setTabArgsSupplier(() -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList())))
+                .setTabCompleter(() -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList())))
             .setExecutor((sender, args) -> {
                 MessageSender.sendMsg(sender, "This server is running " + getDescription().getName() + " version " + getDescription().getVersion() + " by " + getDescription().getAuthors().toString().replace("[", "").replace("]", "") + " (MiraiMC version " + Bukkit.getPluginManager().getPlugin("MiraiMC").getDescription().getVersion() + ")");
                 return true;
@@ -192,13 +193,12 @@ public class Whitelist4QQ extends BukkitPlugin {
             );
         new RootCmdExecutor()
             .setExecutor((sender, args) -> {
-                if (!(sender instanceof Player)) {
+                if (!(sender instanceof Player player)) {
                     MessageSender.sendMsg(sender, Configs.messagesCommandPlayerOnly.value());
                     return true;
                 }
                 if (Configs.whitelistMode.value() != 2)
                     return true;
-                Player player = (Player) sender;
                 if (!WhitelistManager.isVisitor(player.getUniqueId())) {
                     MessageSender.sendMsg(player, Configs.messagesCommandBindBound.value());
                     return true;
