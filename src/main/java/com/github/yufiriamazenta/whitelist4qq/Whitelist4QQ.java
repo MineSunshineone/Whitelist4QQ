@@ -31,6 +31,7 @@ public class Whitelist4QQ extends BukkitPlugin {
 
     public Whitelist4QQ() {
         INSTANCE = this;
+        setHighestSupportVersion(Integer.MAX_VALUE);
     }
 
     public static Whitelist4QQ instance() {
