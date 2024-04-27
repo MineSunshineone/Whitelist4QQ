@@ -15,6 +15,7 @@ public class WhitelistManager {
 
     private static final Map<String, UUID> bindCodeMap = new ConcurrentHashMap<>();
     private static final Map<String, Long> bindCodeTimeStampMap = new ConcurrentHashMap<>();
+    private static final Map<UUID, String> bindPlayerNameCache = new ConcurrentHashMap<>();
     private static final Map<UUID, String> reverseBindCodeMap = new ConcurrentHashMap<>();
     private static final List<UUID> visitors = new CopyOnWriteArrayList<>();
 
@@ -30,6 +31,10 @@ public class WhitelistManager {
         }, 1, 1);
     }
 
+    public static String getBindPlayerName(UUID uuid) {
+        return bindPlayerNameCache.get(uuid);
+    }
+
     public static Map<String, UUID> getBindCodeMap() {
         return bindCodeMap;
     }
@@ -38,14 +43,16 @@ public class WhitelistManager {
         return reverseBindCodeMap;
     }
 
-    public static void addBindCodeCache(String code, UUID uuid) {
+    public static void addBindCodeCache(String code, UUID uuid, String name) {
         bindCodeMap.put(code, uuid);
+        bindPlayerNameCache.put(uuid, name);
         reverseBindCodeMap.put(uuid, code);
         bindCodeTimeStampMap.put(code, System.currentTimeMillis());
     }
 
     public static void removeBindCodeCache(String code) {
         reverseBindCodeMap.remove(bindCodeMap.get(code));
+        bindPlayerNameCache.remove(bindCodeMap.get(code));
         bindCodeMap.remove(code);
         bindCodeTimeStampMap.remove(code);
     }

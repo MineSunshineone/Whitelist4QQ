@@ -2,7 +2,7 @@ package com.github.yufiriamazenta.whitelist4qq.listener;
 
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
-import crypticlib.chat.MessageSender;
+import crypticlib.chat.MsgSender;
 import crypticlib.chat.TextProcessor;
 import crypticlib.listener.BukkitListener;
 import org.bukkit.Bukkit;
@@ -50,7 +50,7 @@ public enum PlayerListener implements Listener {
                 } else {
                     code = UUID.randomUUID().toString();
                     code = code.substring(code.length() - 6);
-                    WhitelistManager.addBindCodeCache(code, uuid);
+                    WhitelistManager.addBindCodeCache(code, uuid, event.getName());
                 }
                 String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, bindHintMsg);
@@ -77,7 +77,7 @@ public enum PlayerListener implements Listener {
                     } else {
                         code = UUID.randomUUID().toString();
                         code = code.substring(code.length() - 6);
-                        WhitelistManager.addBindCodeCache(code, uuid);
+                        WhitelistManager.addBindCodeCache(code, uuid, event.getName());
                     }
                     String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(bindHintMsg));
@@ -167,7 +167,7 @@ public enum PlayerListener implements Listener {
             long lastChatTime = visitorChatTimeMap.get(player.getUniqueId());
             int chatCd = Configs.mode2VisitorChatCd.value() * 1000;
             if (time - lastChatTime < chatCd) {
-                MessageSender.sendMsg(player, Configs.messagesVisitorChatInCd.value());
+                MsgSender.sendMsg(player, Configs.messagesVisitorChatInCd.value());
                 event.setCancelled(true);
                 return;
             }
