@@ -2,9 +2,9 @@ package com.github.yufiriamazenta.whitelist4qq.listener;
 
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
-import crypticlib.chat.MsgSender;
-import crypticlib.chat.TextProcessor;
-import crypticlib.listener.BukkitListener;
+import crypticlib.chat.BukkitMsgSender;
+import crypticlib.chat.BukkitTextProcessor;
+import crypticlib.listener.EventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 玩家相关事件监听
  */
-@BukkitListener
+@EventListener
 public enum PlayerListener implements Listener {
 
     INSTANCE;
@@ -41,7 +41,7 @@ public enum PlayerListener implements Listener {
                 return;
             case NOT_IN_GROUP:
                 String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(notInGroupMsg));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, BukkitTextProcessor.color(notInGroupMsg));
                 break;
             case NO_WHITELIST:
                 String code;
@@ -52,7 +52,7 @@ public enum PlayerListener implements Listener {
                     code = code.substring(code.length() - 6);
                     WhitelistManager.addBindCodeCache(code, uuid, event.getName());
                 }
-                String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
+                String bindHintMsg = BukkitTextProcessor.color(Configs.messagesKickMessageMode1.value().replace("%code%", code));
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, bindHintMsg);
                 break;
             default:
@@ -79,15 +79,15 @@ public enum PlayerListener implements Listener {
                         code = code.substring(code.length() - 6);
                         WhitelistManager.addBindCodeCache(code, uuid, event.getName());
                     }
-                    String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(bindHintMsg));
+                    String bindHintMsg = BukkitTextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, BukkitTextProcessor.color(bindHintMsg));
                     return;
                 }
                 WhitelistManager.addToVisitors(uuid);
                 break;
             case NOT_IN_GROUP:
                 String notInGroupMsg = Configs.messagesKickMessageNotInGroup.value();
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, TextProcessor.color(notInGroupMsg));
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, BukkitTextProcessor.color(notInGroupMsg));
                 break;
             case HAS_WHITELIST:
                 return;
@@ -167,7 +167,7 @@ public enum PlayerListener implements Listener {
             long lastChatTime = visitorChatTimeMap.get(player.getUniqueId());
             int chatCd = Configs.mode2VisitorChatCd.value() * 1000;
             if (time - lastChatTime < chatCd) {
-                MsgSender.sendMsg(player, Configs.messagesVisitorChatInCd.value());
+                BukkitMsgSender.INSTANCE.sendMsg(player, Configs.messagesVisitorChatInCd.value());
                 event.setCancelled(true);
                 return;
             }
