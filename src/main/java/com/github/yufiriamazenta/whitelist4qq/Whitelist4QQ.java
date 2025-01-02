@@ -3,9 +3,9 @@ package com.github.yufiriamazenta.whitelist4qq;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
 import com.github.yufiriamazenta.whitelist4qq.papi.Whitelist4QQExpansion;
 import crypticlib.BukkitPlugin;
-import crypticlib.CrypticLibBukkit;
-import crypticlib.chat.BukkitMsgSender;
-import crypticlib.chat.BukkitTextProcessor;
+import crypticlib.CrypticLib;
+import crypticlib.chat.MsgSender;
+import crypticlib.chat.TextProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class Whitelist4QQ extends BukkitPlugin {
-
     private static Whitelist4QQ INSTANCE;
     private int taskRunSecond = 0;
 
@@ -30,7 +29,7 @@ public class Whitelist4QQ extends BukkitPlugin {
 
     @Override
     public void enable() {
-        CrypticLibBukkit.scheduler().runTaskTimer(this, () -> {
+        CrypticLib.platform().scheduler().runTaskTimer(this, () -> {
             if (Configs.whitelistMode.value() != 2)
                 return;
             Set<UUID> tmpUuids = new HashSet<>();
@@ -44,7 +43,7 @@ public class Whitelist4QQ extends BukkitPlugin {
                 long playedTime = visitor.getStatistic(Statistic.PLAY_ONE_MINUTE);
                 long allowVisitTime = Configs.mode2AllowVisitSecond.value() * 20;
                 if (taskRunSecond >= Configs.mode2HintCd.value()) {
-                    BukkitMsgSender.INSTANCE.sendMsg(visitor, Configs.messagesMode2BindHintMessage.value());
+                    MsgSender.sendMsg(visitor, Configs.messagesMode2BindHintMessage.value());
                     taskRunSecond = 0;
                 }
 
@@ -57,7 +56,7 @@ public class Whitelist4QQ extends BukkitPlugin {
                         code = code.substring(code.length() - 6);
                         WhitelistManager.addBindCodeCache(code, visitor.getUniqueId(), visitor.getName());
                     }
-                    String bindHintMsg = BukkitTextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
+                    String bindHintMsg = TextProcessor.color(Configs.messagesKickMessageMode2.value().replace("%code%", code));
                     visitor.kickPlayer(bindHintMsg);
                 }
             }

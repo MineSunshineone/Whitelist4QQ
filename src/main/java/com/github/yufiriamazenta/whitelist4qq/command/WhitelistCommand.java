@@ -2,15 +2,16 @@ package com.github.yufiriamazenta.whitelist4qq.command;
 
 import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
-import crypticlib.CrypticLibBukkit;
-import crypticlib.chat.BukkitMsgSender;
-import crypticlib.chat.BukkitTextProcessor;
-import crypticlib.command.BukkitCommand;
+import crypticlib.CrypticLib;
+import crypticlib.chat.MsgSender;
+import crypticlib.chat.TextProcessor;
+import crypticlib.command.CommandHandler;
 import crypticlib.command.CommandInfo;
-import crypticlib.command.BukkitSubcommand;
+import crypticlib.command.SubcommandHandler;
 import crypticlib.command.annotation.Command;
 import crypticlib.command.annotation.Subcommand;
 import crypticlib.perm.PermInfo;
+import me.clip.placeholderapi.util.Msg;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -23,30 +24,28 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Command
-public class WhitelistCommand extends BukkitCommand {
+public class WhitelistCommand extends CommandHandler {
     
     public WhitelistCommand() {
         super(
             new CommandInfo(
                 "whitelist4qq",
                 new PermInfo("whitelist4qq.command"),
-                Arrays.asList("qwl", "qwhitelist"),
-                "Whitelist4QQ main command.",
-                "/whitelist4qq|qwl|qwhitelist <...>"
+                new String[]{"qwl", "qwhitelist"}, 
+                "Whitelist4QQ main command."
             )
         );
     }
 
     @Override
-    public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
+    public boolean execute(@NotNull CommandSender sender, @NotNull List<String> args) {
         Plugin plugin = Whitelist4QQ.instance();
-        BukkitMsgSender.INSTANCE.sendMsg(sender,
+        MsgSender.sendMsg(sender,
             "This server is running " +
                 plugin.getDescription().getName() +
                 " version " +
@@ -57,43 +56,46 @@ public class WhitelistCommand extends BukkitCommand {
                 Bukkit.getPluginManager().getPlugin("MiraiMC").getDescription().getVersion() +
                 ")"
         );
+        return true;
     }
 
-    @Subcommand public BukkitSubcommand reload = new BukkitSubcommand("reload") {
+    @Subcommand public SubcommandHandler reload = new SubcommandHandler("reload") {
         @Override
-        public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
+        public boolean execute(@NotNull CommandSender sender, @NotNull List<String> args) {
             Whitelist4QQ.instance().reloadConfig();
-            BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandReload.value());
+            MsgSender.sendMsg(sender, Configs.messagesCommandReload.value());
+            return true;
         }
     }.setPermission("whitelist4qq.command.reload");
     
-    @Subcommand public BukkitSubcommand remove = new BukkitSubcommand("remove") {
+    @Subcommand public SubcommandHandler remove = new SubcommandHandler("remove") {
         @Override
-        public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
+        public boolean execute(@NotNull CommandSender sender, @NotNull List<String> args) {
             if (args.isEmpty()) {
-                BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandRemoveUsage.value());
-                return;
+                MsgSender.sendMsg(sender, Configs.messagesCommandRemoveUsage.value());
+                return true;
             }
             OfflinePlayer player = Bukkit.getOfflinePlayer(args.get(0));
             MiraiMC.removeBind(player.getUniqueId());
-            BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandRemoveSuccess.value());
+            MsgSender.sendMsg(sender, Configs.messagesCommandRemoveSuccess.value());
+            return true;
         }
     }.setPermission("whitelist4qq.command.remove");
     
-    @Subcommand public BukkitSubcommand getBind = new BukkitSubcommand("getbind") {
+    @Subcommand public SubcommandHandler getBind = new SubcommandHandler("getbind") {
         @Override
-        public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
+        public boolean execute(@NotNull CommandSender sender, @NotNull List<String> args) {
             if (args.isEmpty()) {
-                BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
-                return;
+                MsgSender.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
+                return true;
             }
             try {
                 long qq = Long.parseLong(args.get(0));
-                BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetBindSelecting.value());
-                CrypticLibBukkit.scheduler().runTaskAsync(Whitelist4QQ.instance(), () -> {
+                MsgSender.sendMsg(sender, Configs.messagesCommandGetBindSelecting.value());
+                CrypticLib.platform().scheduler().runTaskAsync(Whitelist4QQ.instance(), () -> {
                     UUID bind = MiraiMC.getBind(qq);
                     if (bind == null) {
-                        BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetBindNotExist.value());
+                        MsgSender.sendMsg(sender, Configs.messagesCommandGetBindNotExist.value());
                         return;
                     }
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(bind);
@@ -107,11 +109,11 @@ public class WhitelistCommand extends BukkitCommand {
                         .value()
                         .replace("%qq%", args.get(0))
                         .replace("%player%", name);
-                    BaseComponent answerComponent = BukkitTextProcessor.toComponent(BukkitTextProcessor.color(getBindAnswer));
+                    BaseComponent answerComponent = TextProcessor.toComponent(TextProcessor.color(getBindAnswer));
                     answerComponent.setHoverEvent(
                         new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new BaseComponent[] {BukkitTextProcessor.toComponent(BukkitTextProcessor.color(
+                            new BaseComponent[] {TextProcessor.toComponent(TextProcessor.color(
                                 Configs.messagesCommandGetBindHover.value()
                             ))}
                         )
@@ -122,40 +124,42 @@ public class WhitelistCommand extends BukkitCommand {
                             name
                         )
                     );
-                    BukkitMsgSender.INSTANCE.sendMsg(sender, answerComponent);
+                    MsgSender.sendMsg(sender, answerComponent);
                 });
+                return true;
             } catch (NumberFormatException e) {
-                BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
+                MsgSender.sendMsg(sender, Configs.messagesCommandGetBindInvalidQQ.value());
+                return true;
             }
         }
     }.setPermission("whitelist4qq.command.getbind");
 
-    @Subcommand public BukkitSubcommand getQQ = new BukkitSubcommand("getqq") {
+    @Subcommand public SubcommandHandler getQQ = new SubcommandHandler("getqq") {
         @Override
-        public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
+        public boolean execute(@NotNull CommandSender sender, @NotNull List<String> args) {
             if (args.isEmpty()) {
-                BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetQQInvalidPlayer.value());
-                return;
+                MsgSender.sendMsg(sender, Configs.messagesCommandGetQQInvalidPlayer.value());
+                return true;
             }
-            BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetQQSelecting.value());
-            CrypticLibBukkit.scheduler().runTaskAsync(Whitelist4QQ.instance(), () -> {
+            MsgSender.sendMsg(sender, Configs.messagesCommandGetQQSelecting.value());
+            CrypticLib.platform().scheduler().runTaskAsync(Whitelist4QQ.instance(), () -> {
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args.get(0));
                 UUID uuid = offlinePlayer.getUniqueId();
                 long bind = MiraiMC.getBind(uuid);
                 if (bind == 0) {
-                    BukkitMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandGetQQNotExist.value());
+                    MsgSender.sendMsg(sender, Configs.messagesCommandGetQQNotExist.value());
                     return;
                 }
                 String getQQAnswer = Configs.messagesCommandGetQQSuccess
                     .value()
                     .replace("%qq%", bind + "")
                     .replace("%player%", args.get(0));
-                BaseComponent answerComponent = BukkitTextProcessor.toComponent(BukkitTextProcessor.color(getQQAnswer));
+                BaseComponent answerComponent = TextProcessor.toComponent(TextProcessor.color(getQQAnswer));
                 answerComponent.setHoverEvent(
                     new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
                         new BaseComponent[]{
-                            BukkitTextProcessor.toComponent(BukkitTextProcessor.color(Configs.messagesCommandGetQQHover.value()))
+                            TextProcessor.toComponent(TextProcessor.color(Configs.messagesCommandGetQQHover.value()))
                         }
                     ));
                 answerComponent.setClickEvent(
@@ -164,8 +168,10 @@ public class WhitelistCommand extends BukkitCommand {
                         bind + ""
                     )
                 );
-                BukkitMsgSender.INSTANCE.sendMsg(sender, answerComponent);
+                MsgSender.sendMsg(sender, answerComponent);
             });
+
+            return true;
         }
 
         @Override

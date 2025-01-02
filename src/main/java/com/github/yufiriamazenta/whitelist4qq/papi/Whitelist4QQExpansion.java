@@ -1,10 +1,9 @@
 package com.github.yufiriamazenta.whitelist4qq.papi;
 
-import com.github.yufiriamazenta.whitelist4qq.BindManager;
 import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
-import crypticlib.chat.BukkitTextProcessor;
+import crypticlib.chat.TextProcessor;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +32,8 @@ public class Whitelist4QQExpansion extends PlaceholderExpansion {
         switch (params) {
             case "visitor_tag":
                 UUID uuid = player.getUniqueId();
-                if (BindManager.INSTANCE.isVisitor(uuid)) {
-                    return BukkitTextProcessor.color(Configs.messagesPlaceholderVisitorTag.value());
+                if (WhitelistManager.isVisitor(uuid)) {
+                    return TextProcessor.color(Configs.messagesPlaceholderVisitorTag.value());
                 } else {
                     return null;
                 }

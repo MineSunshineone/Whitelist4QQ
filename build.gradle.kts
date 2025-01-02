@@ -24,9 +24,9 @@ repositories {
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("me.clip:placeholderapi:2.11.1")
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.crypticlib:bukkit:${rootProject.findProperty("crypticlibVer")}")
-    implementation("com.crypticlib:common-database:${rootProject.findProperty("crypticlibVer")}")
+    compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
+    implementation("com.crypticlib:common:0.17.5")
 }
 
 group = "com.github.yufiriamazenta"
