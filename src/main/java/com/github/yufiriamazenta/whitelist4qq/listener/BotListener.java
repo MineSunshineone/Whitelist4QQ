@@ -27,20 +27,23 @@ public enum BotListener implements Listener {
     @EventHandler
     public void onGroupMessage(MiraiGroupMessageEvent e) {
         //收到消息的机器人不在配置中时不触发绑定
-        if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
+        if (!Configs.usedBotAccounts.value().contains(e.getBotID())) {
             return;
+        }
         //收到消息的群不在配置中时不触发绑定
-        if (!Configs.usedGroups.value().contains(e.getGroupID()))
+        if (!Configs.usedGroups.value().contains(e.getGroupID())) {
             return;
+        }
         //只有前缀符合时才触发绑定
-        if (!e.getMessage().startsWith(Configs.bindCommandPrefix.value()))
+        if (!e.getMessage().startsWith(Configs.bindCommandPrefix.value())) {
             return;
+        }
         //阻止已经绑定的QQ绑定
         if (Configs.preventQQRebind.value()) {
             WhitelistManager.WhitelistState whitelistState = WhitelistManager.getWhitelistState(e.getSenderID());
             if (WhitelistManager.WhitelistState.HAS_WHITELIST.equals(whitelistState)) {
                 String playerName;
-                UUID bind = MiraiMC.getBind(e.getSenderID());
+                UUID bind = MiraiMC.Bind.getBind(e.getSenderID());
                 if (bind == null) {
                     playerName = "null";
                 } else {
@@ -59,8 +62,8 @@ public enum BotListener implements Listener {
 
         //去除无关字符
         String bindCode = e.getMessage()
-            .replace(Configs.bindCommandPrefix.value(), "")
-            .replace("\\s", "");
+                .replace(Configs.bindCommandPrefix.value(), "")
+                .replace("\\s", "");
 
         //如果没有对应绑定码则提示绑定失败
         if (!WhitelistManager.getBindCodeMap().containsKey(bindCode)) {
@@ -91,16 +94,19 @@ public enum BotListener implements Listener {
 
     @EventHandler
     public void onSelectPlayer(MiraiGroupMessageEvent e) {
-        if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
+        if (!Configs.usedBotAccounts.value().contains(e.getBotID())) {
             return;
-        if (!Configs.usedGroups.value().contains(e.getGroupID()))
+        }
+        if (!Configs.usedGroups.value().contains(e.getGroupID())) {
             return;
-        if (!e.getMessage().startsWith(Configs.selectPlayerCommandPrefix.value()) && !e.getMessage().startsWith(Configs.selectQQCommandPrefix.value()))
+        }
+        if (!e.getMessage().startsWith(Configs.selectPlayerCommandPrefix.value()) && !e.getMessage().startsWith(Configs.selectQQCommandPrefix.value())) {
             return;
+        }
         if (e.getMessage().startsWith(Configs.selectQQCommandPrefix.value())) {
             String qqStr = e.getMessage()
-                .replace(Configs.selectQQCommandPrefix.value(), "")
-                .replace("\\s", "");
+                    .replace(Configs.selectQQCommandPrefix.value(), "")
+                    .replace("\\s", "");
             try {
                 long qq = Long.parseLong(qqStr);
                 UUID bind = MiraiMC.getBind(qq);
@@ -115,10 +121,10 @@ public enum BotListener implements Listener {
             }
         } else {
             String player = e.getMessage()
-                .replace(Configs.selectPlayerCommandPrefix.value(), "")
-                .replace("\\s", "");
+                    .replace(Configs.selectPlayerCommandPrefix.value(), "")
+                    .replace("\\s", "");
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-            long bind = MiraiMC.getBind(offlinePlayer.getUniqueId());
+            long bind = MiraiMC.Bind.getBind(offlinePlayer.getUniqueId());
             if (bind == 0L) {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectPlayerFailedNotExist.value());
             } else {
@@ -130,8 +136,9 @@ public enum BotListener implements Listener {
 
     @EventHandler
     public void onGroupQuit(MiraiMemberLeaveEvent e) {
-        if (!Configs.remove_bind_when_qq_quit.value())
+        if (!Configs.remove_bind_when_qq_quit.value()) {
             return;
+        }
         if (Configs.usedBotAccounts.value().contains(e.getBotID()) && Configs.usedGroups.value().contains(e.getGroupID())) {
             MiraiMC.removeBind(e.getTargetID());
         }

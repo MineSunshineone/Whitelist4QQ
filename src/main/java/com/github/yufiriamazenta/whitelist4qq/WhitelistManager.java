@@ -59,7 +59,7 @@ public class WhitelistManager {
 
     public static void addBind(long bindQQ, String bindCode) {
         UUID bindUuid = bindCodeMap.get(bindCode);
-        MiraiMC.addBind(bindUuid, bindQQ);
+        MiraiMC.Bind.addBind(bindUuid, bindQQ);
         removeBindCodeCache(bindCode);
         PlayerListener.INSTANCE.getVisitorChatTimestampMap().remove(bindUuid);
         visitors.remove(bindUuid);
@@ -69,7 +69,7 @@ public class WhitelistManager {
         return visitors.contains(uuid);
     }
 
-    public static void addToVisitors(UUID uuid){
+    public static void addToVisitors(UUID uuid) {
         visitors.add(uuid);
     }
 
@@ -79,13 +79,15 @@ public class WhitelistManager {
 
     /**
      * 判断是否有白名单
+     *
      * @param uuid 判断的uuid
      * @return 1为拥有,0为拥有白名单但不在群内,-1为没有白名单
      */
     public static WhitelistState getWhitelistState(UUID uuid) {
-        long bindQQ = MiraiMC.getBind(uuid);
-        if (bindQQ == 0L)
+        long bindQQ = MiraiMC.Bind.getBind(uuid);
+        if (bindQQ == 0L) {
             return WhitelistState.NO_WHITELIST;
+        }
 
         if (!Configs.checkQQInGroup.value()) {
             return WhitelistState.HAS_WHITELIST;
@@ -95,16 +97,18 @@ public class WhitelistManager {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
                     MiraiGroup group1 = miraiBot.getGroup(group);
-                    if (group1.contains(bindQQ))
+                    if (group1.contains(bindQQ)) {
                         return WhitelistState.HAS_WHITELIST;
-                } catch (NoSuchElementException ignored) {}
+                    }
+                } catch (NoSuchElementException ignored) {
+                }
             }
         }
         return WhitelistState.NOT_IN_GROUP;
     }
 
     public static WhitelistState getWhitelistState(long qq) {
-        UUID bindPlayer = MiraiMC.getBind(qq);
+        UUID bindPlayer = MiraiMC.Bind.getBind(qq);
         if (bindPlayer == null) {
             return WhitelistState.NO_WHITELIST;
         }
@@ -117,9 +121,11 @@ public class WhitelistManager {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
                     MiraiGroup group1 = miraiBot.getGroup(group);
-                    if (group1.contains(qq))
+                    if (group1.contains(qq)) {
                         return WhitelistState.HAS_WHITELIST;
-                } catch (NoSuchElementException ignored) {}
+                    }
+                } catch (NoSuchElementException ignored) {
+                }
             }
         }
         return WhitelistState.NOT_IN_GROUP;
