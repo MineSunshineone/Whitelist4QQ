@@ -25,7 +25,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
-    compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.9-rc1")
+    compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.9")
     implementation("com.crypticlib:common:0.17.5")
 }
 

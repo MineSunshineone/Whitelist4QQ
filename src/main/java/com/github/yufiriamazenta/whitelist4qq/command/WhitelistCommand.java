@@ -1,7 +1,20 @@
 package com.github.yufiriamazenta.whitelist4qq.command;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.github.yufiriamazenta.whitelist4qq.Whitelist4QQ;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+
 import crypticlib.CrypticLib;
 import crypticlib.chat.MsgSender;
 import crypticlib.chat.TextProcessor;
@@ -11,22 +24,10 @@ import crypticlib.command.SubcommandHandler;
 import crypticlib.command.annotation.Command;
 import crypticlib.command.annotation.Subcommand;
 import crypticlib.perm.PermInfo;
-import me.clip.placeholderapi.util.Msg;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Command
 public class WhitelistCommand extends CommandHandler {
@@ -78,7 +79,7 @@ public class WhitelistCommand extends CommandHandler {
                 return true;
             }
             OfflinePlayer player = Bukkit.getOfflinePlayer(args.get(0));
-            me.dreamvoid.miraimc.api.MiraiMC.removeBind(player.getUniqueId());
+            MiraiMC.Bind.removeBind(player.getUniqueId());
             MsgSender.sendMsg(sender, Configs.messagesCommandRemoveSuccess.value());
             return true;
         }

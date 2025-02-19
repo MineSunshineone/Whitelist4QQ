@@ -1,20 +1,22 @@
 package com.github.yufiriamazenta.whitelist4qq.listener;
 
+import java.util.Objects;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
 import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
 import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+
 import crypticlib.chat.MsgSender;
 import crypticlib.listener.BukkitListener;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
 import me.dreamvoid.miraimc.bukkit.event.message.passive.MiraiGroupMessageEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * 机器人相关事件监听
@@ -109,7 +111,7 @@ public enum BotListener implements Listener {
                     .replace("\\s", "");
             try {
                 long qq = Long.parseLong(qqStr);
-                UUID bind = MiraiMC.getBind(qq);
+                UUID bind = MiraiMC.Bind.getBind(qq);
                 if (bind == null) {
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectQQFailedNotExist.value());
                 } else {
@@ -140,7 +142,7 @@ public enum BotListener implements Listener {
             return;
         }
         if (Configs.usedBotAccounts.value().contains(e.getBotID()) && Configs.usedGroups.value().contains(e.getGroupID())) {
-            MiraiMC.removeBind(e.getTargetID());
+            MiraiMC.Bind.removeBind(e.getTargetID());
         }
     }
 }
