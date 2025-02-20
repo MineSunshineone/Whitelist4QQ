@@ -1,0 +1,15 @@
+{
+  "id": "whitelist4qq",
+  "name": "Whitelist4QQ",
+  "version": "${version}",
+  "authors": [
+    "Yufiria"
+  ],
+  "main": "pers.yufiria.whitelist4qq.velocity.Whitelist4QQ",
+  "dependencies": [
+    {
+      "id": "miraimc",
+      "optional": false
+    }
+  ]
+}

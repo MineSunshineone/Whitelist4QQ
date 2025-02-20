@@ -1,17 +1,15 @@
-package com.github.yufiriamazenta.whitelist4qq.listener;
+package pers.yufiria.whitelist4qq.velocity.listener;
 
-import com.github.yufiriamazenta.whitelist4qq.WhitelistManager;
-import com.github.yufiriamazenta.whitelist4qq.config.Configs;
+import com.velocitypowered.api.event.Subscribe;
+import crypticlib.listener.EventListener;
+import me.dreamvoid.miraimc.velocity.event.message.passive.MiraiGroupMessageEvent;
+import pers.yufiria.whitelist4qq.velocity.WhitelistManager;
+import pers.yufiria.whitelist4qq.velocity.config.Configs;
 import crypticlib.chat.MsgSender;
-import crypticlib.listener.BukkitListener;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
-import me.dreamvoid.miraimc.bukkit.event.group.member.MiraiMemberLeaveEvent;
-import me.dreamvoid.miraimc.bukkit.event.message.passive.MiraiGroupMessageEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import pers.yufiria.whitelist4qq.velocity.player.OfflinePlayer;
+import pers.yufiria.whitelist4qq.velocity.player.OfflinePlayerManager;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -19,12 +17,12 @@ import java.util.UUID;
 /**
  * 机器人相关事件监听
  */
-@BukkitListener
-public enum BotListener implements Listener {
+@EventListener
+public enum BotListener {
 
     INSTANCE;
 
-    @EventHandler
+    @Subscribe
     public void onGroupMessage(MiraiGroupMessageEvent e) {
         //收到消息的机器人不在配置中时不触发绑定
         if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
@@ -44,11 +42,11 @@ public enum BotListener implements Listener {
                 if (bind == null) {
                     playerName = "null";
                 } else {
-                    OfflinePlayer boundPlayer = Bukkit.getOfflinePlayer(bind);
-                    if (boundPlayer.getName() == null) {
-                        playerName = Objects.requireNonNull(bind).toString();
+                    OfflinePlayer boundPlayer = OfflinePlayerManager.INSTANCE.getOfflinePlayer(bind);
+                    if (boundPlayer == null) {
+                        playerName = "unknown";
                     } else {
-                        playerName = boundPlayer.getName();
+                        playerName = boundPlayer.name();
                     }
                 }
                 String boundMsg = Configs.messagesBotMessageBindFailedBound.value().replace("%player%", playerName);

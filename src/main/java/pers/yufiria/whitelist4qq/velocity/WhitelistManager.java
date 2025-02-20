@@ -1,7 +1,7 @@
-package com.github.yufiriamazenta.whitelist4qq;
+package pers.yufiria.whitelist4qq.velocity;
 
-import com.github.yufiriamazenta.whitelist4qq.config.Configs;
-import com.github.yufiriamazenta.whitelist4qq.listener.PlayerListener;
+import pers.yufiria.whitelist4qq.velocity.config.Configs;
+import pers.yufiria.whitelist4qq.velocity.listener.PlayerListener;
 import crypticlib.CrypticLib;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
@@ -10,6 +10,7 @@ import me.dreamvoid.miraimc.api.bot.MiraiGroup;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class WhitelistManager {
 
@@ -20,7 +21,7 @@ public class WhitelistManager {
     private static final List<UUID> visitors = new CopyOnWriteArrayList<>();
 
     static {
-        CrypticLib.platform().scheduler().runTaskTimer(Whitelist4QQ.instance(), () -> {
+        Whitelist4QQ.instance().buildTask(() -> {
             long timeStamp = System.currentTimeMillis();
             long timeout = Configs.codeTimeoutSecond.value() * 1000;
             for (String key : bindCodeTimeStampMap.keySet()) {
@@ -28,7 +29,7 @@ public class WhitelistManager {
                     removeBindCodeCache(key);
                 }
             }
-        }, 1, 1);
+        }).repeat(50, TimeUnit.MICROSECONDS);
     }
 
     public static String getBindPlayerName(UUID uuid) {
