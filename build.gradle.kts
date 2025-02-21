@@ -22,7 +22,6 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly("me.clip:placeholderapi:2.11.1")
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     compileOnly("io.github.dreamvoid:MiraiMC-Integration:1.8")
     compileOnly("com.electronwill.night-config:core:3.6.7")
@@ -54,8 +53,8 @@ tasks {
         options.encoding = "UTF-8"
     }
     shadowJar {
-        relocate("crypticlib", "${rootProject.group}.${rootProject.name.lowercase()}.crypticlib")
-        archiveFileName.set("${rootProject.name}-velocity-${version}.jar")
+        relocate("crypticlib", "pers.yufiria.whitelist4qq.velocity.crypticlib")
+        archiveFileName.set("${rootProject.name}-${version}.jar")
     }
     assemble {
         dependsOn(shadowJar)

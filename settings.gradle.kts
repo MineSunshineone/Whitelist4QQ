@@ -1,1 +1,1 @@
-rootProject.name = "Whitelist4QQ"
+rootProject.name = "Whitelist4QQ-velocity"

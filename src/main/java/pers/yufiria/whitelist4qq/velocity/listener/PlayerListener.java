@@ -32,8 +32,8 @@ public enum PlayerListener {
                 break;
             case NO_WHITELIST:
                 String code;
-                if (WhitelistManager.getReverseBindCodeMap().containsKey(uuid)) {
-                    code = WhitelistManager.getReverseBindCodeMap().get(uuid);
+                if (WhitelistManager.getReverseBindCodes().containsKey(uuid)) {
+                    code = WhitelistManager.getReverseBindCodes().get(uuid);
                 } else {
                     code = UUID.randomUUID().toString();
                     code = code.substring(code.length() - 6);

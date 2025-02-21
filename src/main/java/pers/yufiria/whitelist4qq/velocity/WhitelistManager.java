@@ -1,8 +1,9 @@
 package pers.yufiria.whitelist4qq.velocity;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import crypticlib.util.IOHelper;
 import pers.yufiria.whitelist4qq.velocity.config.Configs;
-import pers.yufiria.whitelist4qq.velocity.listener.PlayerListener;
-import crypticlib.CrypticLib;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import me.dreamvoid.miraimc.api.bot.MiraiGroup;
@@ -13,56 +14,47 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class WhitelistManager {
-
-    private static final Map<String, UUID> bindCodeMap = new ConcurrentHashMap<>();
-    private static final Map<String, Long> bindCodeTimeStampMap = new ConcurrentHashMap<>();
+    
+    private static final Cache<String, UUID> bindCodes = CacheBuilder.newBuilder().expireAfterWrite(Configs.codeTimeoutSecond.value(), TimeUnit.SECONDS).build();
     private static final Map<UUID, String> bindPlayerNameCache = new ConcurrentHashMap<>();
-    private static final Map<UUID, String> reverseBindCodeMap = new ConcurrentHashMap<>();
+    private static final Cache<UUID, String> reverseBindCodeCache = CacheBuilder.newBuilder().expireAfterWrite(Configs.codeTimeoutSecond.value(), TimeUnit.SECONDS).build();
     private static final List<UUID> visitors = new CopyOnWriteArrayList<>();
-
-    static {
-        Whitelist4QQ.instance().buildTask(() -> {
-            long timeStamp = System.currentTimeMillis();
-            long timeout = Configs.codeTimeoutSecond.value() * 1000;
-            for (String key : bindCodeTimeStampMap.keySet()) {
-                if (timeStamp - bindCodeTimeStampMap.get(key) >= timeout) {
-                    removeBindCodeCache(key);
-                }
-            }
-        }).repeat(50, TimeUnit.MICROSECONDS);
-    }
 
     public static String getBindPlayerName(UUID uuid) {
         return bindPlayerNameCache.get(uuid);
     }
 
-    public static Map<String, UUID> getBindCodeMap() {
-        return bindCodeMap;
+    public static Map<String, UUID> getBindCodes() {
+        return bindCodes.asMap();
     }
 
-    public static Map<UUID, String> getReverseBindCodeMap() {
-        return reverseBindCodeMap;
+    public static Map<UUID, String> getReverseBindCodes() {
+        return reverseBindCodeCache.asMap();
     }
 
     public static void addBindCodeCache(String code, UUID uuid, String name) {
-        bindCodeMap.put(code, uuid);
+        bindCodes.put(code, uuid);
         bindPlayerNameCache.put(uuid, name);
-        reverseBindCodeMap.put(uuid, code);
-        bindCodeTimeStampMap.put(code, System.currentTimeMillis());
+        reverseBindCodeCache.put(uuid, code);
     }
 
     public static void removeBindCodeCache(String code) {
-        reverseBindCodeMap.remove(bindCodeMap.get(code));
-        bindPlayerNameCache.remove(bindCodeMap.get(code));
-        bindCodeMap.remove(code);
-        bindCodeTimeStampMap.remove(code);
+        UUID bindPlayerId = bindCodes.getIfPresent(code);
+        if (bindPlayerId != null) {
+            bindCodes.invalidate(code);
+            reverseBindCodeCache.invalidate(bindPlayerId);
+            bindPlayerNameCache.remove(bindPlayerId);
+        }
     }
 
     public static void addBind(long bindQQ, String bindCode) {
-        UUID bindUuid = bindCodeMap.get(bindCode);
+        UUID bindUuid = bindCodes.getIfPresent(bindCode);
+        if (bindUuid == null) {
+            IOHelper.info("&eBind code " + bindCode + " do not belongs to a player!");
+            return;
+        }
         MiraiMC.addBind(bindUuid, bindQQ);
         removeBindCodeCache(bindCode);
-        PlayerListener.INSTANCE.getVisitorChatTimestampMap().remove(bindUuid);
         visitors.remove(bindUuid);
     }
 

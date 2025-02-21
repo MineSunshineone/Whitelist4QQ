@@ -46,7 +46,7 @@ public class WhitelistCommand extends VelocityCommand {
     ) {
         @Override
         public void execute(@NotNull CommandSource sender, @NotNull List<String> args) {
-            Whitelist4QQ.instance().reloadConfig();
+            Whitelist4QQ.instance().reloadPlugin();
             VelocityMsgSender.INSTANCE.sendMsg(sender, Configs.messagesCommandReload.value());
         }
     };

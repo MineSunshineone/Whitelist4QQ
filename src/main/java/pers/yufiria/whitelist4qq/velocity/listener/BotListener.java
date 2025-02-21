@@ -2,16 +2,15 @@ package pers.yufiria.whitelist4qq.velocity.listener;
 
 import com.velocitypowered.api.event.Subscribe;
 import crypticlib.listener.EventListener;
+import me.dreamvoid.miraimc.velocity.event.group.member.MiraiMemberLeaveEvent;
 import me.dreamvoid.miraimc.velocity.event.message.passive.MiraiGroupMessageEvent;
 import pers.yufiria.whitelist4qq.velocity.WhitelistManager;
 import pers.yufiria.whitelist4qq.velocity.config.Configs;
-import crypticlib.chat.MsgSender;
 import me.dreamvoid.miraimc.api.MiraiBot;
 import me.dreamvoid.miraimc.api.MiraiMC;
 import pers.yufiria.whitelist4qq.velocity.player.OfflinePlayer;
 import pers.yufiria.whitelist4qq.velocity.player.OfflinePlayerManager;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -61,33 +60,29 @@ public enum BotListener {
             .replace("\\s", "");
 
         //如果没有对应绑定码则提示绑定失败
-        if (!WhitelistManager.getBindCodeMap().containsKey(bindCode)) {
+        if (!WhitelistManager.getBindCodes().containsKey(bindCode)) {
             MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageBindFailedNotExistCode.value());
             return;
         }
 
         //添加绑定
         String playerName;
-        UUID uuid = WhitelistManager.getBindCodeMap().get(bindCode);
-        OfflinePlayer bindPlayer = Bukkit.getOfflinePlayer(uuid);
-        if (bindPlayer.getName() == null) {
+        UUID uuid = WhitelistManager.getBindCodes().get(bindCode);
+        OfflinePlayer bindPlayer = OfflinePlayerManager.INSTANCE.getOfflinePlayer(uuid);
+        if (bindPlayer == null) {
             playerName = WhitelistManager.getBindPlayerName(uuid);
         } else {
-            playerName = bindPlayer.getName();
+            playerName = bindPlayer.name();
         }
         if (playerName == null) {
             playerName = uuid.toString();
         }
         String replyMsg = Configs.messagesBotMessageBindSuccess.value().replace("%player%", playerName);
-        if (bindPlayer.isOnline()) {
-            MsgSender.sendMsg(Objects.requireNonNull(bindPlayer.getPlayer()), Configs.messagesCommandBindBind.value().replace("%qq%", e.getSenderID() + ""));
-        } else {
-            MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(replyMsg);
-        }
+        MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(replyMsg);
         WhitelistManager.addBind(e.getSenderID(), bindCode);
     }
 
-    @EventHandler
+    @Subscribe
     public void onSelectPlayer(MiraiGroupMessageEvent e) {
         if (!Configs.usedBotAccounts.value().contains(e.getBotID()))
             return;
@@ -105,18 +100,29 @@ public enum BotListener {
                 if (bind == null) {
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectQQFailedNotExist.value());
                 } else {
-                    String msg = Configs.messagesBotMessageSelectQQSuccess.value().replace("%player%", Bukkit.getOfflinePlayer(bind).getName());
+                    OfflinePlayer boundPlayer = OfflinePlayerManager.INSTANCE.getOfflinePlayer(bind);
+                    String playerName;
+                    if (boundPlayer == null) {
+                        playerName = "unknown";
+                    } else {
+                        playerName = boundPlayer.name();
+                    }
+                    String msg = Configs.messagesBotMessageSelectQQSuccess.value().replace("%player%", playerName);
                     MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(msg);
                 }
             } catch (NumberFormatException exc) {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectQQFailedNumberFormat.value());
             }
         } else {
-            String player = e.getMessage()
+            String playerName = e.getMessage()
                 .replace(Configs.selectPlayerCommandPrefix.value(), "")
                 .replace("\\s", "");
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-            long bind = MiraiMC.getBind(offlinePlayer.getUniqueId());
+            OfflinePlayer offlinePlayer = OfflinePlayerManager.INSTANCE.getOfflinePlayer(playerName);
+            if (offlinePlayer == null) {
+                MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectPlayerFailedUnknownPlayer.value());
+                return;
+            }
+            long bind = MiraiMC.getBind(offlinePlayer.uuid());
             if (bind == 0L) {
                 MiraiBot.getBot(e.getBotID()).getGroup(e.getGroupID()).sendMessage(Configs.messagesBotMessageSelectPlayerFailedNotExist.value());
             } else {
@@ -126,7 +132,7 @@ public enum BotListener {
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onGroupQuit(MiraiMemberLeaveEvent e) {
         if (!Configs.remove_bind_when_qq_quit.value())
             return;
