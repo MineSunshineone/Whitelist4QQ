@@ -9,7 +9,7 @@ import java.util.Arrays;
 @ConfigHandler(path = "config.yml")
 public class Configs {
 
-    public static final StringConfig messagesKickMessage = new StringConfig("messages.kick_message",
+    public static final StringConfig messagesKickMessage = new StringConfig("messages.kick_message.common",
         """
             &c你不在本服的白名单中，请加入我们的QQ群123456进行申请
             &c申请方式：在群内发送“申请白名单%code%”
