@@ -1,5 +1,6 @@
 package pers.yufiria.whitelist4qq.velocity;
 
+import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
@@ -22,7 +23,7 @@ public class Whitelist4QQ extends VelocityPlugin {
 
     private static Whitelist4QQ INSTANCE;
 
-    public Whitelist4QQ(Logger logger, ProxyServer proxyServer, PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
+    public @Inject Whitelist4QQ(Logger logger, ProxyServer proxyServer, PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
         super(logger, proxyServer, pluginContainer, dataDirectory);
     }
 
