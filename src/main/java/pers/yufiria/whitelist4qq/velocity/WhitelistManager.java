@@ -1,20 +1,24 @@
 package pers.yufiria.whitelist4qq.velocity;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import crypticlib.util.IOHelper;
-import pers.yufiria.whitelist4qq.velocity.config.Configs;
-import me.dreamvoid.miraimc.api.MiraiBot;
-import me.dreamvoid.miraimc.api.MiraiMC;
-import me.dreamvoid.miraimc.api.bot.MiraiGroup;
-
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
+import crypticlib.util.IOHelper;
+import me.dreamvoid.miraimc.api.MiraiBot;
+import me.dreamvoid.miraimc.api.MiraiMC;
+import me.dreamvoid.miraimc.api.bot.MiraiGroup;
+import pers.yufiria.whitelist4qq.velocity.config.Configs;
+
 public class WhitelistManager {
-    
+
     private static final Cache<String, UUID> bindCodes = CacheBuilder.newBuilder().expireAfterWrite(Configs.codeTimeoutSecond.value(), TimeUnit.SECONDS).build();
     private static final Map<UUID, String> bindPlayerNameCache = new ConcurrentHashMap<>();
     private static final Cache<UUID, String> reverseBindCodeCache = CacheBuilder.newBuilder().expireAfterWrite(Configs.codeTimeoutSecond.value(), TimeUnit.SECONDS).build();
@@ -53,7 +57,7 @@ public class WhitelistManager {
             IOHelper.info("&eBind code " + bindCode + " do not belongs to a player!");
             return;
         }
-        MiraiMC.addBind(bindUuid, bindQQ);
+        MiraiMC.Bind.addBind(bindUuid, bindQQ);
         removeBindCodeCache(bindCode);
         visitors.remove(bindUuid);
     }
@@ -62,7 +66,7 @@ public class WhitelistManager {
         return visitors.contains(uuid);
     }
 
-    public static void addToVisitors(UUID uuid){
+    public static void addToVisitors(UUID uuid) {
         visitors.add(uuid);
     }
 
@@ -72,13 +76,15 @@ public class WhitelistManager {
 
     /**
      * 判断是否有白名单
+     *
      * @param uuid 判断的uuid
      * @return 1为拥有,0为拥有白名单但不在群内,-1为没有白名单
      */
     public static WhitelistState getWhitelistState(UUID uuid) {
-        long bindQQ = MiraiMC.getBind(uuid);
-        if (bindQQ == 0L)
+        long bindQQ = MiraiMC.Bind.getBind(uuid);
+        if (bindQQ == 0L) {
             return WhitelistState.NO_WHITELIST;
+        }
 
         if (!Configs.checkQQInGroup.value()) {
             return WhitelistState.HAS_WHITELIST;
@@ -88,16 +94,18 @@ public class WhitelistManager {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
                     MiraiGroup group1 = miraiBot.getGroup(group);
-                    if (group1.contains(bindQQ))
+                    if (group1.contains(bindQQ)) {
                         return WhitelistState.HAS_WHITELIST;
-                } catch (NoSuchElementException ignored) {}
+                    }
+                } catch (NoSuchElementException ignored) {
+                }
             }
         }
         return WhitelistState.NOT_IN_GROUP;
     }
 
     public static WhitelistState getWhitelistState(long qq) {
-        UUID bindPlayer = MiraiMC.getBind(qq);
+        UUID bindPlayer = MiraiMC.Bind.getBind(qq);
         if (bindPlayer == null) {
             return WhitelistState.NO_WHITELIST;
         }
@@ -110,9 +118,11 @@ public class WhitelistManager {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
                     MiraiGroup group1 = miraiBot.getGroup(group);
-                    if (group1.contains(qq))
+                    if (group1.contains(qq)) {
                         return WhitelistState.HAS_WHITELIST;
-                } catch (NoSuchElementException ignored) {}
+                    }
+                } catch (NoSuchElementException ignored) {
+                }
             }
         }
         return WhitelistState.NOT_IN_GROUP;

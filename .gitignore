@@ -26,3 +26,6 @@ hs_err_pid*
 *.iml
 
 /out/
+.vscode/
+.gradle/
+build/
