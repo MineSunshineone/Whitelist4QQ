@@ -90,10 +90,10 @@ public class WhitelistManager {
             return WhitelistState.HAS_WHITELIST;
         }
         for (long bot : Configs.usedBotAccounts.value()) {
-            for (Long group : Configs.usedGroups.value()) {
+            for (Number group : Configs.usedGroups.value()) {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
-                    MiraiGroup group1 = miraiBot.getGroup(group);
+                    MiraiGroup group1 = miraiBot.getGroup(group.longValue());
                     if (group1.contains(bindQQ)) {
                         return WhitelistState.HAS_WHITELIST;
                     }
@@ -114,10 +114,10 @@ public class WhitelistManager {
             return WhitelistState.HAS_WHITELIST;
         }
         for (long bot : Configs.usedBotAccounts.value()) {
-            for (Long group : Configs.usedGroups.value()) {
+            for (Number group : Configs.usedGroups.value()) {
                 try {
                     MiraiBot miraiBot = MiraiBot.getBot(bot);
-                    MiraiGroup group1 = miraiBot.getGroup(group);
+                    MiraiGroup group1 = miraiBot.getGroup(group.longValue());
                     if (group1.contains(qq)) {
                         return WhitelistState.HAS_WHITELIST;
                     }

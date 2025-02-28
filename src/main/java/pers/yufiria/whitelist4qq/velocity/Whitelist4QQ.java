@@ -1,5 +1,9 @@
 package pers.yufiria.whitelist4qq.velocity;
 
+import java.nio.file.Path;
+
+import org.slf4j.Logger;
+
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
@@ -7,24 +11,25 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.Scheduler;
-import crypticlib.VelocityPlugin;
-import org.slf4j.Logger;
 
-import java.nio.file.Path;
+import crypticlib.VelocityPlugin;
 
 @Plugin(
-    id = "{{id}}",
-    name = "{{name}}",
-    version = "{{version}}",
-    dependencies = {@Dependency(id = "miraimc")},
-    authors = {"YufiriaMazenta"}
+        id = "{{id}}",
+        name = "{{name}}",
+        version = "{{version}}",
+        dependencies = {
+            @Dependency(id = "miraimc")},
+        authors = {"YufiriaMazenta"}
 )
 public class Whitelist4QQ extends VelocityPlugin {
 
     private static Whitelist4QQ INSTANCE;
 
-    public @Inject Whitelist4QQ(Logger logger, ProxyServer proxyServer, PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
+    public @Inject
+    Whitelist4QQ(Logger logger, ProxyServer proxyServer, PluginContainer pluginContainer, @DataDirectory Path dataDirectory) {
         super(logger, proxyServer, pluginContainer, dataDirectory);
+        INSTANCE = this;
     }
 
     public static Whitelist4QQ instance() {
